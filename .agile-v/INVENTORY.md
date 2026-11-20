@@ -2,7 +2,7 @@
 
 The private backup is stored outside the repository. It contains `verification.json`, `working-tree-baseline.json`, `repository-inventory.json`, and one complete `.git` copy per project. Keep it private.
 
-At discovery, all 21 used npm lockfiles and had READMEs; none had installed node_modules. Each nested repository was on local `main`, had one worktree, and showed a modified LICENSE plus six untracked files. Remote-tracking refs were local snapshots, not proof of remote availability.
+At discovery, all 21 used npm lockfiles and had READMEs; none had installed node_modules. Each nested repository was on local `main`, had one worktree, and showed a modified LICENSE plus six untracked files. Remote-tracking refs were local snapshots, not proof of remote availability. The cleanup paths below are historical; projects 1–9 were later renamed with leading zeroes.
 
 | Project | Framework | Scripts | Vercel config | Exact proposed cleanup target |
 | --- | --- | --- | --- | --- |

@@ -8,15 +8,15 @@ Environment names below come from checked-in example/template files only and may
 
 | Project / root directory | Historical GitHub repository | Framework | Environment names in templates |
 | --- | --- | --- | --- |
-| `portfolio-ui-design-1` | `https://github.com/arnobt78/portfolio-ui-1.git` | Next.js | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
-| `portfolio-ui-design-2` | `https://github.com/arnobt78/portfolio-ui-2.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-3` | `https://github.com/arnobt78/portfolio-ui-3.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-4` | `https://github.com/arnobt78/portfolio-ui-4.git` | React/Vite | `VITE_APP_EMAILJS_PUBLIC_KEY`, `VITE_APP_EMAILJS_SERVICE_ID`, `VITE_APP_EMAILJS_TEMPLATE_ID` |
-| `portfolio-ui-design-5` | `https://github.com/arnobt78/portfolio-ui-5.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-6` | `https://github.com/arnobt78/portfolio-ui-6.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-7` | `https://github.com/arnobt78/portfolio-ui-7.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-8` | `https://github.com/arnobt78/portfolio-ui-8.git` | React/Vite | None found in templates |
-| `portfolio-ui-design-9` | `https://github.com/arnobt78/portfolio-ui-9.git` | Next.js | None found in templates |
+| `portfolio-ui-design-01` | `https://github.com/arnobt78/portfolio-ui-1.git` | Next.js | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
+| `portfolio-ui-design-02` | `https://github.com/arnobt78/portfolio-ui-2.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-03` | `https://github.com/arnobt78/portfolio-ui-3.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-04` | `https://github.com/arnobt78/portfolio-ui-4.git` | React/Vite | `VITE_APP_EMAILJS_PUBLIC_KEY`, `VITE_APP_EMAILJS_SERVICE_ID`, `VITE_APP_EMAILJS_TEMPLATE_ID` |
+| `portfolio-ui-design-05` | `https://github.com/arnobt78/portfolio-ui-5.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-06` | `https://github.com/arnobt78/portfolio-ui-6.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-07` | `https://github.com/arnobt78/portfolio-ui-7.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-08` | `https://github.com/arnobt78/portfolio-ui-8.git` | React/Vite | None found in templates |
+| `portfolio-ui-design-09` | `https://github.com/arnobt78/portfolio-ui-9.git` | Next.js | None found in templates |
 | `portfolio-ui-design-10` | `https://github.com/arnobt78/10-tailwind-portfolio.git` | React/Vite | None found in templates |
 | `portfolio-ui-design-11` | `https://github.com/arnobt78/portfolio-ui-11--not-.git` | React/Vite | `EMAIL_PASS`, `EMAIL_TO`, `EMAIL_USER`, `PORT`, `VITE_MAILCHIMP_ID`, `VITE_MAILCHIMP_U`, `VITE_MAILCHIMP_URL` |
 | `portfolio-ui-design-12` | `https://github.com/arnobt78/portfolio-ui-12.git` | React/Vite | None found in templates |

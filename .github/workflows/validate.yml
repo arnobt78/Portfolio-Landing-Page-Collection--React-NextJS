@@ -20,7 +20,7 @@ jobs:
         project: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     defaults:
       run:
-        working-directory: portfolio-ui-design-${{ matrix.project }}
+        working-directory: portfolio-ui-design-${{ matrix.project < 10 && format('0{0}', matrix.project) || matrix.project }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: ${{ matrix.project <= 3 && '26' || '22' }}
           cache: npm
-          cache-dependency-path: portfolio-ui-design-${{ matrix.project }}/package-lock.json
+          cache-dependency-path: portfolio-ui-design-${{ matrix.project < 10 && format('0{0}', matrix.project) || matrix.project }}/package-lock.json
       - id: install
         run: npm ci --no-audit --no-fund
       - run: npm run lint --if-present
