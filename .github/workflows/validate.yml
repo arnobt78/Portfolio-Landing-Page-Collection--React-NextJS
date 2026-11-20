@@ -1,0 +1,44 @@
+name: Validate projects
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Project ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        project: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+    defaults:
+      run:
+        working-directory: portfolio-ui-design-${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.project <= 3 && '26' || '22' }}
+          cache: npm
+          cache-dependency-path: portfolio-ui-design-${{ matrix.project }}/package-lock.json
+      - id: install
+        run: npm ci --no-audit --no-fund
+      - run: npm run lint --if-present
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+      - run: npm run test --if-present
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+      - run: npm run type-check --if-present
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+      - run: npm run build --if-present
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
