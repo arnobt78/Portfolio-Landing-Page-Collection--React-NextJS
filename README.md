@@ -8,15 +8,15 @@ The collection uses React with Next.js or Vite. Individual projects also use tec
 
 | Project | Stack | Overview |
 | --- | --- | --- |
-| [1](portfolio-ui-design-1/README.md) | Next.js, TypeScript, Tailwind CSS | Animated developer portfolio with a 3D globe and project sections. |
-| [2](portfolio-ui-design-2/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D astronaut portfolio with interactive sections and a contact form. |
-| [3](portfolio-ui-design-3/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D portfolio with animation and a contact form. |
-| [4](portfolio-ui-design-4/README.md) | React/Vite, JavaScript, Tailwind CSS | Developer portfolio with 3D visuals and an experience timeline. |
-| [5](portfolio-ui-design-5/README.md) | React/Vite, JavaScript, Tailwind CSS | Portfolio with 3D visuals and scroll-triggered animation. |
-| [6](portfolio-ui-design-6/README.md) | React/Vite, JavaScript, Tailwind CSS | Dark-themed portfolio with a contact form. |
-| [7](portfolio-ui-design-7/README.md) | React/Vite, JavaScript | Animated section-based portfolio using mock data. |
-| [8](portfolio-ui-design-8/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D developer portfolio with project and experience sections. |
-| [9](portfolio-ui-design-9/README.md) | Next.js, TypeScript, Tailwind CSS | TypeScript portfolio with CSS scroll animations. |
+| [1](portfolio-ui-design-01/README.md) | Next.js, TypeScript, Tailwind CSS | Animated developer portfolio with a 3D globe and project sections. |
+| [2](portfolio-ui-design-02/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D astronaut portfolio with interactive sections and a contact form. |
+| [3](portfolio-ui-design-03/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D portfolio with animation and a contact form. |
+| [4](portfolio-ui-design-04/README.md) | React/Vite, JavaScript, Tailwind CSS | Developer portfolio with 3D visuals and an experience timeline. |
+| [5](portfolio-ui-design-05/README.md) | React/Vite, JavaScript, Tailwind CSS | Portfolio with 3D visuals and scroll-triggered animation. |
+| [6](portfolio-ui-design-06/README.md) | React/Vite, JavaScript, Tailwind CSS | Dark-themed portfolio with a contact form. |
+| [7](portfolio-ui-design-07/README.md) | React/Vite, JavaScript | Animated section-based portfolio using mock data. |
+| [8](portfolio-ui-design-08/README.md) | React/Vite, JavaScript, Tailwind CSS | 3D developer portfolio with project and experience sections. |
+| [9](portfolio-ui-design-09/README.md) | Next.js, TypeScript, Tailwind CSS | TypeScript portfolio with CSS scroll animations. |
 | [10](portfolio-ui-design-10/README.md) | React/Vite, JavaScript, Tailwind CSS | Developer profile with skills and project cards. |
 | [11](portfolio-ui-design-11/README.md) | React/Vite, JavaScript | Portfolio with an Express contact API and newsletter signup. |
 | [12](portfolio-ui-design-12/README.md) | React/Vite, JavaScript | Scroll-snap portfolio with 3D visuals and a contact form. |
@@ -37,7 +37,7 @@ Individual READMEs contain screenshots and further details. Historical demo link
 Use the Node.js version required by the chosen project. For example, project 1 uses Node 26. Then install and run from that project’s directory:
 
 ```sh
-cd portfolio-ui-design-1
+cd portfolio-ui-design-01
 npm ci
 npm run dev
 ```
