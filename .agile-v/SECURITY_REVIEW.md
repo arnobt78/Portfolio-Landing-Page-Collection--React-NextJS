@@ -12,7 +12,7 @@ Lockfile-only `npm audit` was attempted on each project. Counts below are adviso
 | 2 | 0 | 0 | 0 | 0 | Updated lockfile audit passed on 2026-11-20; original lockfile had 19 advisories |
 | 3 | 0 | 0 | 0 | 0 | Updated dependency audit passed on 2026-11-21; original lockfile had 32 advisories |
 | 4 | 0 | 0 | 0 | 0 | Updated dependency audit passed on 2026-11-22; original lockfile had 16 advisories. |
-| 5 | — | — | — | — | Timed out or audit error |
+| 5 | 0 | 0 | 0 | 0 | Node 26 clean-install audit passed on 2026-11-23 after local dependency updates; deployment not verified. |
 | 6 | 1 | 3 | 10 | 0 | Advisories reported |
 | 7 | — | — | — | — | Timed out or audit error |
 | 8 | 1 | 10 | 14 | 0 | Advisories reported |
