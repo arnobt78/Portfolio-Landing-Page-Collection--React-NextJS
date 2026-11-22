@@ -1,6 +1,10 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+const subscribeToBrowser = () => () => {};
+const isSafariBrowser = () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const serverIsSafari = () => false;
 
 /**
  * Animated gradient background: multiple radial blobs with CSS animations. Optional pointer-follow blob;
@@ -99,12 +103,8 @@ export const BackgroundGradientAnimation = ({
     }
   };
 
-  const [isSafari, setIsSafari] = useState(false);
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
-    }
-  }, []);
+  // Keep the server snapshot stable, then select Safari's filter after hydration.
+  const isSafari = useSyncExternalStore(subscribeToBrowser, isSafariBrowser, serverIsSafari);
 
   return (
     <div

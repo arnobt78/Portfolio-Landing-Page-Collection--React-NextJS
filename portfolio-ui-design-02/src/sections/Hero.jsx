@@ -16,15 +16,16 @@ const Hero = () => {
   // Adjust astronaut scale/position for smaller screens to fit viewport
   const isMobile = useMediaQuery({ maxWidth: 853 });
   return (
-    <section className="flex items-start justify-center min-h-screen overflow-hidden md:items-start md:justify-start c-space">
+    <section id="home" className="flex items-start justify-center min-h-screen overflow-hidden md:items-start md:justify-start c-space">
       <HeroText />
       <ParallaxBackground />
       <figure
         className="absolute inset-0"
         style={{ width: "100vw", height: "100vh" }}
       >
+        <Loader />
         <Canvas camera={{ position: [0, 1, 3] }}>
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={null}>
             <Float>
               <Astronaut
                 scale={isMobile && 0.23}

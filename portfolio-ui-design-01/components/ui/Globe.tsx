@@ -2,14 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Color, Scene, Fog, PerspectiveCamera, Vector3 } from "three";
 import ThreeGlobe from "three-globe";
-import { useThree, Object3DNode, Canvas, extend } from "@react-three/fiber";
+import { useThree, type ThreeElement, Canvas, extend } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import countries from "@/data/globe.json";
 
 /** Register ThreeGlobe so we can use <threeGlobe /> in JSX. */
 declare module "@react-three/fiber" {
   interface ThreeElements {
-    threeGlobe: Object3DNode<ThreeGlobe, typeof ThreeGlobe>;
+    threeGlobe: ThreeElement<typeof ThreeGlobe>;
   }
 }
 
@@ -97,14 +97,6 @@ export function Globe({ globeConfig, data }: WorldProps) {
     ...globeConfig,
   };
 
-  useEffect(() => {
-    if (globeRef.current) {
-      _buildData();
-      _buildMaterial();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globeRef.current]);
-
   const _buildMaterial = () => {
     if (!globeRef.current) return;
 
@@ -157,21 +149,12 @@ export function Globe({ globeConfig, data }: WorldProps) {
   };
 
   useEffect(() => {
-    if (globeRef.current && globeData) {
-      globeRef.current
-        .hexPolygonsData(countries.features)
-        .hexPolygonResolution(3)
-        .hexPolygonMargin(0.7)
-        .showAtmosphere(defaultProps.showAtmosphere)
-        .atmosphereColor(defaultProps.atmosphereColor)
-        .atmosphereAltitude(defaultProps.atmosphereAltitude)
-        .hexPolygonColor((e) => {
-          return defaultProps.polygonColor;
-        });
-      startAnimation();
+    if (globeRef.current) {
+      _buildData();
+      _buildMaterial();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globeData]);
+  }, []);
 
   /** Configure arcs, points, and rings on the globe from data and defaultProps. */
   const startAnimation = () => {
@@ -213,6 +196,23 @@ export function Globe({ globeConfig, data }: WorldProps) {
   };
 
   useEffect(() => {
+    if (globeRef.current && globeData) {
+      globeRef.current
+        .hexPolygonsData(countries.features)
+        .hexPolygonResolution(3)
+        .hexPolygonMargin(0.7)
+        .showAtmosphere(defaultProps.showAtmosphere)
+        .atmosphereColor(defaultProps.atmosphereColor)
+        .atmosphereAltitude(defaultProps.atmosphereAltitude)
+        .hexPolygonColor((e) => {
+          return defaultProps.polygonColor;
+        });
+      startAnimation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globeData]);
+
+  useEffect(() => {
     if (!globeRef.current || !globeData) return;
 
     const interval = setInterval(() => {
@@ -232,7 +232,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globeRef.current, globeData]);
+  }, [globeData]);
 
   return (
     <>

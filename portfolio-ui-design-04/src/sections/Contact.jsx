@@ -1,7 +1,7 @@
 /**
  * Contact — Section with TitleHeader, form (name, email, message), and 3D ContactExperience.
  * Form submit uses EmailJS (sendForm) with env: VITE_APP_EMAILJS_SERVICE_ID, TEMPLATE_ID, PUBLIC_KEY.
- * Controlled inputs; loading state during send; form reset on success; errors logged to console.
+ * Controlled inputs; loading state during send; form reset on success; errors stay visible for retry.
  */
 import { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
@@ -12,6 +12,7 @@ import ContactExperience from "../components/models/contact/ContactExperience";
 const Contact = () => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [sendError, setSendError] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -26,20 +27,22 @@ const Contact = () => {
   /** Sends form via EmailJS; formRef.current must match the form element (name/email/message). */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true); // Show loading state
+    setSendError(false);
 
     try {
       await emailjs.sendForm(
         import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
         formRef.current,
-        import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
+        { publicKey: import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY }
       );
 
       // Reset form and stop loading
       setForm({ name: "", email: "", message: "" });
-    } catch (error) {
-      console.error("EmailJS Error:", error); // Optional: show toast
+    } catch {
+      setSendError(true);
     } finally {
       setLoading(false); // Always stop loading, even on error
     }
@@ -99,7 +102,10 @@ const Contact = () => {
                   />
                 </div>
 
-                <button type="submit">
+                {sendError && (
+                  <p role="alert">Unable to send your message. Please try again.</p>
+                )}
+                <button type="submit" disabled={loading}>
                   <div className="cta-button group">
                     <div className="bg-circle" />
                     <p className="text">

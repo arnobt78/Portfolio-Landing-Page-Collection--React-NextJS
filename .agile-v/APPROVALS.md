@@ -6,4 +6,6 @@ The user approved the listed Git metadata cleanup and execution of the complete 
 | --- | --- | --- | --- |
 | C1 Git cleanup | C1-GIT-CLEANUP-20261120 | APPROVED | User / 2026-11-20 |
 | Next project selection | C1-NEXT-PROJECT-20261120 | APPROVED | User selected project 3 |
-| Next project selection | C1-NEXT-PROJECT-20261121 | PENDING | User selection required |
+| Next project selection | C1-NEXT-PROJECT-20261121 | APPROVED | User selected project 04 and project 01 remediation / 2026-11-22 |
+| Project 04 and 01 plan | C1-P04-P01-20261122 | APPROVED | User / 2026-11-22 |
+| Publication of verified follow-up | C1-PR-01-04-20261122 | APPROVED | User authorized push, PR and squash merge / 2026-11-22 |

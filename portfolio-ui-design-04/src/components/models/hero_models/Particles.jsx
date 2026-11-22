@@ -5,6 +5,12 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 
+// Stable particle positions avoid changing the scene during React renders.
+const particleValue = (index, salt) => {
+  const value = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+};
+
 const Particles = ({ count = 200 }) => {
   const mesh = useRef();
 
@@ -13,11 +19,11 @@ const Particles = ({ count = 200 }) => {
     for (let i = 0; i < count; i++) {
       temp.push({
         position: [
-          (Math.random() - 0.5) * 10,
-          Math.random() * 10 + 5, // higher starting point
-          (Math.random() - 0.5) * 10,
+          (particleValue(i, 1) - 0.5) * 10,
+          particleValue(i, 2) * 10 + 5, // higher starting point
+          (particleValue(i, 3) - 0.5) * 10,
         ],
-        speed: 0.005 + Math.random() * 0.001,
+        speed: 0.005 + particleValue(i, 4) * 0.001,
       });
     }
     return temp;
