@@ -12,10 +12,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
-          'vendor-gsap': ['gsap', '@gsap/react'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('/three/') || id.includes('/@react-three/')) return 'vendor-three';
+          if (id.includes('/gsap/') || id.includes('/@gsap/')) return 'vendor-gsap';
+          if (id.includes('/react/') || id.includes('/react-dom/')) return 'vendor-react';
         },
       },
     },

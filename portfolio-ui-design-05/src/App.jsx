@@ -1,8 +1,8 @@
 /**
  * Root App component. Wraps the entire site in Lenis for smooth scrolling and
- * shows a loading overlay until Three.js assets (e.g. Hero planet) are fully loaded.
+ * shows non-blocking progress while Three.js assets (e.g. Hero planet) load.
  */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Navbar from "./sections/Navbar";
 import Hero from "./sections/Hero";
 import ServiceSummary from "./sections/ServiceSummary";
@@ -16,23 +16,18 @@ import { useProgress } from "@react-three/drei";
 
 const App = () => {
   // useProgress() comes from React Three Fiber/Drei; tracks loading of 3D assets (used in Hero)
-  const { progress } = useProgress();
-  const [isReady, setIsReady] = useState(false);
-
-  // Once all assets are loaded (progress === 100), reveal the main content with a fade
-  useEffect(() => {
-    if (progress === 100) {
-      setIsReady(true);
-    }
-  }, [progress]);
+  const { progress, errors } = useProgress();
+  const [sceneFailed, setSceneFailed] = useState(false);
+  // A failed decorative model must not prevent visitors from using the portfolio.
+  const isReady = progress === 100 || errors.length > 0 || sceneFailed;
 
   return (
     // Lenis provides smooth, momentum-based scrolling; root makes it the scroll container
     <ReactLenis root className="relative w-screen min-h-screen overflow-x-auto">
-      {/* Full-screen loading overlay with progress bar until 3D scene is ready */}
+      {/* Decorative assets must never block the page, even on a stalled connection. */}
       {!isReady && (
-        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light">
-          <p className="mb-4 text-xl tracking-widest animate-pulse">
+        <div role="status" className="pointer-events-none fixed bottom-4 right-4 z-[999] flex flex-col items-center rounded bg-black/80 p-4 text-white font-light">
+          <p className="mb-2 text-sm tracking-widest">
             Loading {Math.floor(progress)}%
           </p>
           <div className="relative h-1 overflow-hidden rounded w-60 bg-white/20">
@@ -43,14 +38,10 @@ const App = () => {
           </div>
         </div>
       )}
-      {/* Main content: fades in after loading; section order defines page flow */}
-      <div
-        className={`${
-          isReady ? "opacity-100" : "opacity-0"
-        } transition-opacity duration-1000`}
-      >
+      {/* Section order defines page flow independently of the decorative model. */}
+      <div>
         <Navbar />
-        <Hero />
+        <Hero onSceneError={() => setSceneFailed(true)} />
         <ServiceSummary />
         <Services />
         <About />

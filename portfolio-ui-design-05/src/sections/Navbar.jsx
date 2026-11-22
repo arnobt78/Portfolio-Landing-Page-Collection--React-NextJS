@@ -95,20 +95,46 @@ const Navbar = () => {
   }, []);
 
   // Play timelines forward to open, reverse to close
-  const toggleMenu = () => {
-    if (isOpen) {
+  const setMenuOpen = (open) => {
+    if (!open) {
       tl.current.reverse();
       iconTl.current.reverse();
     } else {
       tl.current.play();
       iconTl.current.play();
     }
-    setIsOpen(!isOpen);
+    setIsOpen(open);
   };
   return (
     <>
+      {/* Burger button: clipPath animates to hide when scrolling down, show when scrolling up */}
+      <button
+        type="button"
+        aria-label={isOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={isOpen}
+        aria-controls="site-navigation"
+        onFocus={() => setShowBurger(true)}
+        className="fixed z-[60] flex flex-col items-center justify-center gap-1 transition-all duration-300 bg-black rounded-full cursor-pointer w-14 h-14 md:w-20 md:h-20 top-4 right-10"
+        onClick={() => setMenuOpen(!isOpen)}
+        style={
+          showBurger || isOpen
+            ? { clipPath: "circle(50% at 50% 50%)" }
+            : { clipPath: "circle(0% at 50% 50%)" }
+        }
+      >
+        <span
+          ref={topLineRef}
+          className="block w-8 h-0.5 bg-white rounded-full origin-center"
+        ></span>
+        <span
+          ref={bottomLineRef}
+          className="block w-8 h-0.5 bg-white rounded-full origin-center"
+        ></span>
+      </button>
       <nav
         ref={navRef}
+        id="site-navigation"
+        inert={!isOpen}
         className="fixed z-50 flex flex-col justify-between w-full h-full px-10 uppercase bg-black text-white/80 py-28 gap-y-10 md:w-1/2 md:left-1/2"
       >
         {/* Section IDs must match: home → #home, services → #services, etc. for react-scroll */}
@@ -121,7 +147,9 @@ const Navbar = () => {
                   to={`${section}`}
                   smooth
                   offset={0}
-                  duration={2000}
+                  duration={600}
+                  href={`#${section}`}
+                  onClick={() => setMenuOpen(false)}
                 >
                   {section}
                 </Link>
@@ -157,25 +185,6 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      {/* Burger button: clipPath animates to hide when scrolling down, show when scrolling up */}
-      <div
-        className="fixed z-50 flex flex-col items-center justify-center gap-1 transition-all duration-300 bg-black rounded-full cursor-pointer w-14 h-14 md:w-20 md:h-20 top-4 right-10"
-        onClick={toggleMenu}
-        style={
-          showBurger
-            ? { clipPath: "circle(50% at 50% 50%)" }
-            : { clipPath: "circle(0% at 50% 50%)" }
-        }
-      >
-        <span
-          ref={topLineRef}
-          className="block w-8 h-0.5 bg-white rounded-full origin-center"
-        ></span>
-        <span
-          ref={bottomLineRef}
-          className="block w-8 h-0.5 bg-white rounded-full origin-center"
-        ></span>
-      </div>
     </>
   );
 };
