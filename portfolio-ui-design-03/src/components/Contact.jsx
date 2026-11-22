@@ -30,6 +30,7 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
 
     // Wrap configuration errors in the same failure path as rejected requests.
@@ -87,6 +88,7 @@ const Contact = () => {
             <input
               type='text'
               name='name'
+              required
               value={form.name}
               onChange={handleChange}
               placeholder="What's your good name?"
@@ -98,6 +100,7 @@ const Contact = () => {
             <input
               type='email'
               name='email'
+              required
               value={form.email}
               onChange={handleChange}
               placeholder="What's your web address?"
@@ -109,6 +112,7 @@ const Contact = () => {
             <textarea
               rows={7}
               name='message'
+              required
               value={form.message}
               onChange={handleChange}
               placeholder='What you want to say?'
@@ -118,6 +122,7 @@ const Contact = () => {
 
           <button
             type='submit'
+            disabled={loading}
             className='bg-tertiary py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md shadow-primary'
           >
             {loading ? "Sending..." : "Send"}

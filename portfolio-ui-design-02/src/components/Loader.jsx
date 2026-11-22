@@ -1,15 +1,16 @@
 /**
- * Loader - 3D scene loading indicator shown inside Canvas while models load.
+ * Loader - overlay shown above the 3D scene while models load.
  * useProgress from @react-three/drei reports loading progress (0–100).
  */
-import { Html, useProgress } from "@react-three/drei";
+import { useProgress } from "@react-three/drei";
 
 const Loader = () => {
-  const { progress } = useProgress();
+  const { active, progress } = useProgress();
+  if (!active) return null;
   return (
-    <Html center className="text-xl font-normal text-center">
+    <div role="status" className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none text-xl font-normal text-center">
       {progress}% Loaded
-    </Html>
+    </div>
   );
 };
 

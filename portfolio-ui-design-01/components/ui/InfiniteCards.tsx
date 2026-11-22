@@ -28,26 +28,25 @@ export const InfiniteMovingCards = ({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollerRef = React.useRef<HTMLUListElement>(null);
 
-  useEffect(() => {
-    addAnimation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const [start, setStart] = useState(false);
   /** Clone each card and append so the list can scroll infinitely without a visible gap. */
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
 
-      scrollerContent.forEach((item) => {
+      const duplicates = scrollerContent.map((item) => {
         const duplicatedItem = item.cloneNode(true);
         if (scrollerRef.current) {
           scrollerRef.current.appendChild(duplicatedItem);
         }
+        return duplicatedItem;
       });
 
       getDirection();
       getSpeed();
       setStart(true);
+      // React may replay effects in development; remove only nodes added here.
+      return () => duplicates.forEach((item) => item.parentNode?.removeChild(item));
     }
   }
   const getDirection = () => {
@@ -76,6 +75,10 @@ export const InfiniteMovingCards = ({
       }
     }
   };
+  useEffect(() => {
+    return addAnimation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div
       ref={containerRef}

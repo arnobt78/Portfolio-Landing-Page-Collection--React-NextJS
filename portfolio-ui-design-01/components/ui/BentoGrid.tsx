@@ -61,6 +61,7 @@ export const BentoGridItem = ({
   const rightLists = ["VueJS", "NuxtJS", "GraphQL"];
 
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   const defaultOptions = {
     loop: copied,
@@ -72,10 +73,15 @@ export const BentoGridItem = ({
   };
 
   /** Copy email to clipboard and trigger Lottie confetti (defaultOptions uses copied state). */
-  const handleCopy = () => {
-    const text = "hsu@jsmastery.pro";
-    navigator.clipboard.writeText(text);
-    setCopied(true);
+  const handleCopy = async () => {
+    setCopyError(false);
+    try {
+      await navigator.clipboard.writeText("hsu@jsmastery.pro");
+      setCopied(true);
+    } catch {
+      setCopied(false);
+      setCopyError(true);
+    }
   };
 
   return (
@@ -189,7 +195,8 @@ export const BentoGridItem = ({
                 }`}
               >
                 {/* <img src="/confetti.gif" alt="confetti" /> */}
-                <Lottie options={defaultOptions} height={200} width={400} />
+                {/* Explicit playback keeps confetti in sync with the copied state. */}
+                <Lottie options={defaultOptions} isStopped={!copied} height={200} width={400} />
               </div>
 
               <MagicButton
@@ -199,6 +206,11 @@ export const BentoGridItem = ({
                 handleClick={handleCopy}
                 otherClasses="!bg-[#161A31]"
               />
+              {copyError && (
+                <p role="alert" className="mt-2 text-sm text-white">
+                  Unable to copy the email. Please try again.
+                </p>
+              )}
             </div>
           )}
         </div>

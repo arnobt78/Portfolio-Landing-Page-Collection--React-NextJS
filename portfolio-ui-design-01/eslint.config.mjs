@@ -4,11 +4,13 @@ import tsParser from "@typescript-eslint/parser";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
+import nextVitals from "eslint-config-next/core-web-vitals";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const config = [
+  ...nextVitals,
   {
     ignores: [
       ".next/**",

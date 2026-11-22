@@ -33,6 +33,7 @@ const Contact = () => {
   /** Submits form via EmailJS; shows success or error alert */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
@@ -57,7 +58,7 @@ const Contact = () => {
     }
   };
   return (
-    <section className="relative flex items-center c-space section-spacing">
+    <section id="contact" className="relative flex items-center c-space section-spacing">
       <Particles
         className="absolute inset-0 -z-50"
         quantity={100}
@@ -127,6 +128,7 @@ const Contact = () => {
           </div>
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full px-1 py-3 text-lg text-center rounded-md cursor-pointer bg-radial from-lavender to-royal hover-animation"
           >
             {!isLoading ? "Send" : "Sending..."}
