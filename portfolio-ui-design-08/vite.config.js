@@ -6,18 +6,12 @@ export default defineConfig({
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 1100,
-    rollupOptions: {
-      onwarn(warning, warn) {
-        // Suppress eval warning from three-stdlib/lottie (third-party dependency)
-        if (warning.code === 'EVAL') return
-        warn(warning)
-      },
+    rolldownOptions: {
       output: {
-        // Split vendors to reduce main bundle and improve caching
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-three': ['three', 'three-stdlib', '@react-three/fiber', '@react-three/drei'],
-          'vendor-gsap': ['gsap', '@gsap/react'],
+        manualChunks(id) {
+          if (!id.includes('/node_modules/')) return;
+          if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
+          if (/\/node_modules\/(gsap|@gsap)\//.test(id)) return 'vendor-gsap';
         },
       },
     },

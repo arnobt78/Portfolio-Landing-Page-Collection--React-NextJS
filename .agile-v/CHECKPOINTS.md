@@ -10,5 +10,6 @@
 | Project 05 modernization plan | APPROVED | C1-P05-20261122 | User approved the scoped plan; project 05 is prepared separately after PR 3 merged. |
 | Project 06 modernization plan | APPROVED | C1-P06-20261123 | User approved the scoped project 06 plan. |
 | Project 07 frontend plan | APPROVED | C1-P07-20261123 | User approved frontend modernization; optional Sanity Studio migration is deferred. |
+| Project 08 modernization plan | APPROVED | C1-P08-20261123 | User approved the scoped implementation plan. |
 
 This checkpoint approves the specified metadata cleanup and the project 04 and 01 implementation plan, including dependency installation. Deployment and release acceptance have not been approved.

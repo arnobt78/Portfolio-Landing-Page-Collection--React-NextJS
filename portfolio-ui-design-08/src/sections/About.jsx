@@ -1,19 +1,38 @@
-import { useState } from 'react';
-import Globe from 'react-globe.gl';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 import Button from '../components/Button.jsx';
+import SceneBoundary from '../components/SceneBoundary.jsx';
+
+const Globe = lazy(() => import('react-globe.gl'));
 
 const About = () => {
-  const [hasCopied, setHasCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState('');
+  const [showGlobe, setShowGlobe] = useState(false);
+  const globeContainer = useRef(null);
 
-  /** Copies email to clipboard and shows tick icon for 2s, then reverts to copy icon. */
-  const handleCopy = () => {
-    navigator.clipboard.writeText(' john@doe.com');
-    setHasCopied(true);
+  // Start the globe download before it enters view while reserving its space.
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) {
+      setShowGlobe(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setShowGlobe(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '400px' });
+    observer.observe(globeContainer.current);
+    return () => observer.disconnect();
+  }, []);
 
-    setTimeout(() => {
-      setHasCopied(false);
-    }, 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText('john@doe.com');
+      setCopyStatus('Email copied.');
+    } catch {
+      setCopyStatus('Unable to copy. Please select the email address.');
+    }
   };
 
   return (
@@ -49,9 +68,9 @@ const About = () => {
 
         <div className="col-span-1 xl:row-span-4">
           <div className="grid-container">
-            <div className="rounded-3xl w-full sm:h-[326px] h-fit flex justify-center items-center">
+            <div ref={globeContainer} className="rounded-3xl w-full h-[326px] flex justify-center items-center">
               {/* react-globe.gl: night earth texture with optional label (e.g. location). */}
-              <Globe
+              {showGlobe && <SceneBoundary><Suspense fallback={null}><Globe
                 height={326}
                 width={326}
                 backgroundColor="rgba(0, 0, 0, 0)"
@@ -61,12 +80,12 @@ const About = () => {
                 globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
                 bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
                 labelsData={[{ lat: 40, lng: -100, text: 'Rjieka, Croatia', color: 'white', size: 15 }]}
-              />
+              /></Suspense></SceneBoundary>}
             </div>
             <div>
               <p className="grid-headtext">I’m very flexible with time zone communications & locations</p>
               <p className="grid-subtext">I&apos;m based in Rjieka, Croatia and open to remote work worldwide.</p>
-              <Button name="Contact Me" isBeam containerClass="w-full mt-10" />
+              <Button href="#contact" name="Contact Me" isBeam containerClass="w-full mt-10" />
             </div>
           </div>
         </div>
@@ -95,10 +114,11 @@ const About = () => {
 
             <div className="space-y-2">
               <p className="grid-subtext text-center">Contact me</p>
-              <div className="copy-container" onClick={handleCopy}>
-                <img src={hasCopied ? 'assets/tick.svg' : 'assets/copy.svg'} alt="copy" />
-                <p className="lg:text-2xl md:text-xl font-medium text-gray_gradient text-white">john@doe.com</p>
-              </div>
+              <button type="button" className="copy-container mx-auto" onClick={handleCopy} aria-label="Copy email address">
+                <img src={copyStatus === 'Email copied.' ? 'assets/tick.svg' : 'assets/copy.svg'} alt="" />
+                <span className="lg:text-2xl md:text-xl font-medium text-gray_gradient text-white">john@doe.com</span>
+              </button>
+              <p role="status" className="text-center text-white-600">{copyStatus}</p>
             </div>
           </div>
         </div>

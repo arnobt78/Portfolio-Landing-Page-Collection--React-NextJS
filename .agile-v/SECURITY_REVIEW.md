@@ -1,5 +1,7 @@
 # C1 security review
 
+Project 08 uses browser-visible EmailJS configuration; it must not contain private credentials and does not replace provider-side abuse controls. Missing configuration and mocked provider failure preserve input; no live delivery was tested. Node 26 clean-install audit reported zero advisories. No Vercel firewall settings were changed.
+
 A limited scan of 1,341 Git-eligible text files up to 5 MiB found no high-confidence private-key, AWS access key, GitHub token, or Google API key patterns. This is not an exhaustive secret review. No eligible real `.env` files or generated dependency/build directories were found. No eligible files exceeded 50 MiB.
 
 Before baseline publication, Gitleaks scanned the staged changes and reported two matches. Manual review identified a Spotify image URL and a Vemetric browser tracking token; Vemetric documents that token as public. Neither match was identified as a private credential. This scan is not exhaustive; the existing project 17 tracking integration remains in place.

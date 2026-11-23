@@ -5,7 +5,7 @@ import useAlert from '../hooks/useAlert.js';
 import Alert from '../components/Alert.jsx';
 
 const Contact = () => {
-  const formRef = useRef();
+  const submitting = useRef(false);
 
   const { alert, showAlert, hideAlert } = useAlert();
   const [loading, setLoading] = useState(false);
@@ -17,51 +17,37 @@ const Contact = () => {
     setForm({ ...form, [name]: value });
   };
 
-  /** Sends form via EmailJS using env vars; shows success/error alert and resets form on success. */
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (submitting.current) return;
+
+    const serviceId = import.meta.env.VITE_APP_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY;
+    if (!serviceId || !templateId || !publicKey) {
+      showAlert({ text: 'Contact form is not configured. Please use the email address above.', type: 'danger' });
+      return;
+    }
+
+    submitting.current = true;
     setLoading(true);
-
-    emailjs
-      .send(
-        import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          to_name: 'John Doe',
-          from_email: form.email,
-          to_email: 'john@doe.com',
-          message: form.message,
-        },
-        import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY,
-      )
-      .then(() => {
-        setLoading(false);
-        showAlert({
-          show: true,
-          text: 'Thank you for your message 😃',
-          type: 'success',
-        });
-          setTimeout(() => {
-            hideAlert(false);
-            setForm({
-              name: '',
-              email: '',
-              message: '',
-            });
-          }, [3000]);
-        },
-        (error) => {
-          setLoading(false);
-          console.error(error);
-
-          showAlert({
-            show: true,
-            text: "I didn't receive your message 😢",
-            type: 'danger',
-          });
-        },
-      );
+    hideAlert();
+    try {
+      await emailjs.send(serviceId, templateId, {
+        from_name: form.name,
+        to_name: 'John Doe',
+        from_email: form.email,
+        to_email: 'john@doe.com',
+        message: form.message,
+      }, publicKey);
+      setForm({ name: '', email: '', message: '' });
+      showAlert({ text: 'Thank you for your message 😃', type: 'success' });
+    } catch {
+      showAlert({ text: "I didn't receive your message. Please try again.", type: 'danger' });
+    } finally {
+      submitting.current = false;
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,11 +64,12 @@ const Contact = () => {
             life, I’m here to help.
           </p>
 
-          <form ref={formRef} onSubmit={handleSubmit} className="mt-12 flex flex-col space-y-7">
+          <form onSubmit={handleSubmit} className="mt-12 flex flex-col space-y-7">
             <label className="space-y-3">
               <span className="field-label">Full Name</span>
               <input
                 type="text"
+                disabled={loading}
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -96,6 +83,7 @@ const Contact = () => {
               <span className="field-label">Email address</span>
               <input
                 type="email"
+                disabled={loading}
                 name="email"
                 value={form.email}
                 onChange={handleChange}
@@ -108,6 +96,7 @@ const Contact = () => {
             <label className="space-y-3">
               <span className="field-label">Your message</span>
               <textarea
+                disabled={loading}
                 name="message"
                 value={form.message}
                 onChange={handleChange}

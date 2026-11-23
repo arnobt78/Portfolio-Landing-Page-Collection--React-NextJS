@@ -1,3 +1,4 @@
+import SceneBoundary from '../components/SceneBoundary.jsx';
 import { Leva } from 'leva';
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -33,7 +34,7 @@ const Hero = () => {
       </div>
 
       <div className="w-full h-full absolute inset-0">
-        <Canvas className="w-full h-full">
+        <SceneBoundary><Canvas className="w-full h-full">
           {/* Suspense shows CanvasLoader while GLTF/textures load */}
           <Suspense fallback={<CanvasLoader />}>
             {/* To hide controller */}
@@ -54,13 +55,11 @@ const Hero = () => {
             <ambientLight intensity={1} />
             <directionalLight position={[10, 10, 10]} intensity={0.5} />
           </Suspense>
-        </Canvas>
+        </Canvas></SceneBoundary>
       </div>
 
       <div className="absolute bottom-7 left-0 right-0 w-full z-10 c-space">
-        <a href="#about" className="w-fit">
-          <Button name="Let's work together" isBeam containerClass="sm:w-fit w-full sm:min-w-96" />
-        </a>
+        <Button href="#about" name="Let's work together" isBeam containerClass="sm:w-fit w-full sm:min-w-96" />
       </div>
     </section>
   );

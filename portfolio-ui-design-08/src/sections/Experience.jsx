@@ -1,3 +1,4 @@
+import SceneBoundary from '../components/SceneBoundary.jsx';
 import { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -17,7 +18,7 @@ const WorkExperience = () => {
 
         <div className="work-container">
           <div className="work-canvas">
-            <Canvas>
+            <SceneBoundary><Canvas>
               <ambientLight intensity={7} />
               <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
               <directionalLight position={[10, 10, 10]} intensity={1} />
@@ -27,18 +28,21 @@ const WorkExperience = () => {
                 {/* Developer plays FBX animation matching animationName (from workExperiences[].animation). */}
                 <Developer position-y={-3} scale={3} animationName={animationName} />
               </Suspense>
-            </Canvas>
+            </Canvas></SceneBoundary>
           </div>
 
           <div className="work-content">
             <div className="sm:py-10 py-5 sm:px-5 px-2.5">
               {workExperiences.map((item, index) => (
-                <div
+                <button
+                  type="button"
                   key={index}
                   onClick={() => setAnimationName(item.animation.toLowerCase())}
                   onPointerOver={() => setAnimationName(item.animation.toLowerCase())}
                   onPointerOut={() => setAnimationName('idle')}
-                  className="work-content_container group">
+                  onFocus={() => setAnimationName(item.animation.toLowerCase())}
+                  onBlur={() => setAnimationName('idle')}
+                  className="work-content_container group w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
                   <div className="flex flex-col h-full justify-start items-center py-2">
                     <div className="work-content_logo">
                       <img className="w-full h-full" src={item.icon} alt="" />
@@ -54,7 +58,7 @@ const WorkExperience = () => {
                     </p>
                     <p className="group-hover:text-white transition-all ease-in-out duration-500">{item.title}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
