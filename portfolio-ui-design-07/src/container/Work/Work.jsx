@@ -9,33 +9,18 @@ import './Work.scss';
 // Portfolio section: list of works, filter by tag (All, UI/UX, Web App, etc.), hover overlay with view/code links.
 const Work = () => {
   const [works, setWorks] = useState([]);
-  const [filterWork, setFilterWork] = useState([]);
   const [activeFilter, setActiveFilter] = useState('All');
-  const [animateCard, setAnimateCard] = useState({ y: 0, opacity: 1 });
 
   useEffect(() => {
     const query = '*[_type == "works"]';
     client.fetch(query).then((data) => {
       setWorks(data);
-      setFilterWork(data);
     });
   }, []);
 
-  // Filter by tag: brief fade-out, then set filtered list and animate back in.
-  const handleWorkFilter = (item) => {
-    setActiveFilter(item);
-    setAnimateCard([{ y: 100, opacity: 0 }]);
-
-    setTimeout(() => {
-      setAnimateCard([{ y: 0, opacity: 1 }]);
-
-      if (item === 'All') {
-        setFilterWork(works);
-      } else {
-        setFilterWork(works.filter((work) => work.tags.includes(item)));
-      }
-    }, 500);
-  };
+  // Derive the visible cards from the selected filter to avoid stale delayed updates.
+  const filterWork = activeFilter === 'All'
+    ? works : works.filter((work) => work.tags.includes(activeFilter));
 
   return (
     <>
@@ -44,18 +29,20 @@ const Work = () => {
       {/* Filter buttons: active class highlights selected; click filters works by work.tags. */}
       <div className="app__work-filter">
         {['UI/UX', 'Web App', 'Mobile App', 'React JS', 'All'].map((item, index) => (
-          <div
+          <button
+            type="button"
             key={index}
-            onClick={() => handleWorkFilter(item)}
+            onClick={() => setActiveFilter(item)}
+            aria-pressed={activeFilter === item}
             className={`app__work-filter-item app__flex p-text ${activeFilter === item ? 'item-active' : ''}`}
           >
             {item}
-          </div>
+          </button>
         ))}
       </div>
 
       <motion.div
-        animate={animateCard}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delayChildren: 0.5 }}
         className="app__work-portfolio"
       >
@@ -64,14 +51,14 @@ const Work = () => {
             <div
               className="app__work-img app__flex"
             >
-              <img src={urlFor(work.imgUrl)} alt={work.name} />
+              <img src={urlFor(work.imgUrl)} alt={work.title} />
 
               <motion.div
                 whileHover={{ opacity: [0, 1] }}
                 transition={{ duration: 0.25, ease: 'easeInOut', staggerChildren: 0.5 }}
                 className="app__work-hover app__flex"
               >
-                <a href={work.projectLink} target="_blank" rel="noreferrer">
+                <a href={work.projectLink} target="_blank" rel="noreferrer" aria-label={`View ${work.title}`}>
 
                   <motion.div
                     whileInView={{ scale: [0, 1] }}
@@ -82,7 +69,7 @@ const Work = () => {
                     <AiFillEye />
                   </motion.div>
                 </a>
-                <a href={work.codeLink} target="_blank" rel="noreferrer">
+                <a href={work.codeLink} target="_blank" rel="noreferrer" aria-label={`View ${work.title} source code`}>
                   <motion.div
                     whileInView={{ scale: [0, 1] }}
                     whileHover={{ scale: [1, 0.90] }}

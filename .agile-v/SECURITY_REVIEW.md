@@ -16,7 +16,7 @@ Lockfile-only `npm audit` was attempted on each project. Counts below are adviso
 | 4 | 0 | 0 | 0 | 0 | Updated dependency audit passed on 2026-11-22; original lockfile had 16 advisories. |
 | 5 | 0 | 0 | 0 | 0 | Node 26 clean-install audit passed on 2026-11-23 after local dependency updates; deployment not verified. |
 | 6 | 0 | 0 | 0 | 0 | Node 26 clean-install audit passed on 2026-11-23 after dependency updates. EmailJS uses public browser configuration; provider-side abuse controls and live delivery were not verified. |
-| 7 | — | — | — | — | Timed out or audit error |
+| 7 | 0 | 0 | 0 | 0 | Frontend clean-install audit passed on 2026-11-23. The separate unused Sanity 2 Studio lockfile reported 173 advisories (14 critical, 53 high); its migration was explicitly deferred. Frontend ESLint 8 is end-of-life but retained due to the existing Airbnb configuration's peer range. |
 | 8 | 1 | 10 | 14 | 0 | Advisories reported |
 | 9 | — | — | — | — | Timed out or audit error |
 | 10 | 1 | 3 | 10 | 0 | Advisories reported |

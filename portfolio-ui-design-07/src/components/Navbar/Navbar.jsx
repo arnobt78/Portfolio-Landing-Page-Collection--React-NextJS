@@ -26,14 +26,17 @@ const Navbar = () => {
 
       {/* Mobile: hamburger (HiMenuAlt4) toggles overlay; HiX closes; links close menu on click. */}
       <div className="app__navbar-menu">
-        <HiMenuAlt4 onClick={() => setToggle(true)} />
+        <button type="button" aria-label="Open navigation" aria-expanded={toggle} aria-controls="mobile-navigation" className="app__navbar-toggle" onClick={() => setToggle(true)}>
+          <HiMenuAlt4 />
+        </button>
 
         {toggle && (
           <motion.div
+            id="mobile-navigation"
             whileInView={{ x: [300, 0] }}
             transition={{ duration: 0.85, ease: 'easeOut' }}
           >
-            <HiX onClick={() => setToggle(false)} />
+            <button type="button" aria-label="Close navigation" className="app__navbar-close" onClick={() => setToggle(false)}><HiX /></button>
             <ul>
               {['home', 'about', 'work', 'skills', 'contact'].map((item) => (
                 <li key={item}>

@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable jsx-a11y/anchor-has-content */
-
 import React from 'react';
 
 // Vertical dot nav: each dot links to a section. `active` is the current section id so the dot can be highlighted.
@@ -9,6 +6,7 @@ const NavigationDots = ({ active }) => (
     {['home', 'about', 'work', 'skills', 'testimonial', 'contact'].map((item, index) => (
       <a
         href={`#${item}`}
+        aria-label={`Go to ${item}`}
         key={item + index}
         className="app__navigation-dot"
         style={active === item ? { backgroundColor: '#313BAC' } : {}}

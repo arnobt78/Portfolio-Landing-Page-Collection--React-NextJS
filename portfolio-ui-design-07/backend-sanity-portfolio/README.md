@@ -74,16 +74,9 @@ Schema is registered in `schemas/schema.js` and wired in `sanity.json` via `part
 
 ## Linking to the frontend
 
-The main app uses **mock data** in `src/mockData.js` and does not call Sanity by default. To use this backend:
+The main app uses **mock data** in `src/mockData.js` and does not call Sanity. Connecting this Studio requires a separate implementation and security review; environment variables alone do not enable it. Configure the project, dataset and allowed origins for that integration through the [Sanity project settings](https://www.sanity.io/manage).
 
-1. Create a Sanity project at [sanity.io](https://www.sanity.io), get **Project ID** and (if needed) **API token**.
-2. In the **frontend** repo root, add a `.env` (see root `.env.example`):
-   - `VITE_SANITY_PROJECT_ID=<your-project-id>`
-   - `VITE_SANITY_TOKEN=<token>` (if using restricted API)
-3. In the frontend, restore the Sanity client in `src/client.js` (replace the mock-only client with one that uses `createClient` from `@sanity/client` and, in production, only when you want to use Sanity).
-4. Configure CORS for your frontend origin (e.g. `https://portfolio-ui-7.vercel.app`) in the [Sanity project settings](https://www.sanity.io/manage).
-
-Update **backend** `sanity.json` so `api.projectId` and `api.dataset` match the project you use in the frontend.
+Never put a private Sanity API token in a `VITE_*` variable or frontend bundle. Restricted operations require an appropriate server-side integration with authorization and server-side secret storage.
 
 ---
 
