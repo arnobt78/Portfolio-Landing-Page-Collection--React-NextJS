@@ -4,6 +4,8 @@ A limited scan of 1,341 Git-eligible text files up to 5 MiB found no high-confid
 
 Before baseline publication, Gitleaks scanned the staged changes and reported two matches. Manual review identified a Spotify image URL and a Vemetric browser tracking token; Vemetric documents that token as public. Neither match was identified as a private credential. This scan is not exhaustive; the existing project 17 tracking integration remains in place.
 
+The user requested closure of GitGuardian incident 27937045 on 2026-11-23. The flagged value is used as a client-visible Vemetric project tracking token, consistent with [Vemetric's integration example](https://vemetric.com/); the provider distinguishes its [private API keys](https://vemetric.com/docs/api/getting-started) from the tracking script. The incident remains open because the available GitGuardian token has scan-only and honeytoken-check scopes, not incident-management permission. Removing the value from the current file would not remove its historical occurrences or classify the incident.
+
 Lockfile-only `npm audit` was attempted on each project. Counts below are advisories reported by npm for that project, including development dependencies; they are not deduplicated across projects. Projects 1–4 reflect their updated lockfiles; most other rows are from the earlier consolidation audit and may have changed. Registry timeouts remain unverified.
 
 | Project | Low | Moderate | High | Critical | Status |
