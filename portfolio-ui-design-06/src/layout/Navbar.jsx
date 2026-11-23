@@ -56,12 +56,16 @@ export const Navbar = () => {
 
         {/* CTA Button */}
         <div className="hidden md:block">
-          <Button size="sm">Contact Me</Button>
+          <Button size="sm" href="#contact">Contact Me</Button>
         </div>
 
         {/* Mobile Menu Button */}
         {/* Toggle opens/closes mobile menu; clicking a nav link closes it (see onClick on links below) */}
         <button
+          type="button"
+          aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-navigation"
           className="md:hidden p-2 text-foreground cursor-pointer"
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
         >
@@ -71,7 +75,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden glass-strong animate-fade-in">
+        <div id="mobile-navigation" className="md:hidden glass-strong animate-fade-in">
           <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
             {navLinks.map((link, index) => (
               <a
@@ -84,7 +88,7 @@ export const Navbar = () => {
               </a>
             ))}
 
-            <Button onClick={() => setIsMobileMenuOpen(false)}>
+            <Button href="#contact" onClick={() => setIsMobileMenuOpen(false)}>
               Contact Me
             </Button>
           </div>
