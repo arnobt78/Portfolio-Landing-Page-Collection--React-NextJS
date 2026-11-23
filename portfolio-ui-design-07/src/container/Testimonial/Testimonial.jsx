@@ -31,7 +31,7 @@ const Testimonial = () => {
 
   return (
     <>
-      {testimonials.length && (
+      {testimonials.length > 0 && (
         <>
           <div className="app__testimonial-item app__flex">
             <img src={urlFor(testimonials[currentIndex].imgurl)} alt={testimonials[currentIndex].name} />
@@ -46,13 +46,13 @@ const Testimonial = () => {
 
           {/* Prev/next: wrap around (first -> last, last -> first). */}
           <div className="app__testimonial-btns app__flex">
-            <div className="app__flex" onClick={() => handleClick(currentIndex === 0 ? testimonials.length - 1 : currentIndex - 1)}>
+            <button type="button" aria-label="Previous testimonial" className="app__flex" onClick={() => handleClick(currentIndex === 0 ? testimonials.length - 1 : currentIndex - 1)}>
               <HiChevronLeft />
-            </div>
+            </button>
 
-            <div className="app__flex" onClick={() => handleClick(currentIndex === testimonials.length - 1 ? 0 : currentIndex + 1)}>
+            <button type="button" aria-label="Next testimonial" className="app__flex" onClick={() => handleClick(currentIndex === testimonials.length - 1 ? 0 : currentIndex + 1)}>
               <HiChevronRight />
-            </div>
+            </button>
           </div>
         </>
       )}
@@ -62,7 +62,7 @@ const Testimonial = () => {
           <motion.div
             whileInView={{ opacity: [0, 1] }}
             transition={{ duration: 0.5, type: 'tween' }}
-            key={brand._id}
+            key={brand._id || brand.name}
           >
             <img src={urlFor(brand.imgUrl)} alt={brand.name} />
           </motion.div>

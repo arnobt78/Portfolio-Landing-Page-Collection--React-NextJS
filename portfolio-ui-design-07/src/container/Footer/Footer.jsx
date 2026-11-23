@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { images } from '../../constants';
 import { AppWrap, MotionWrap } from '../../wrapper';
 import { client } from '../../client';
 import './Footer.scss';
 
-// Contact section: email/phone links + form. Submits via client.create() (mock returns fake id); then shows thank-you message.
+// Contact section uses the local demo client and does not send messages.
 const Footer = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     message: '',
   });
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
 
   const { username, email, message } = formData;
 
@@ -22,9 +23,12 @@ const Footer = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Sends payload to client.create(); on success shows thank-you; on error just stops loading.
-  const handleSubmit = () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
+    setStatus('');
 
     const contact = {
       _type: 'contact',
@@ -33,15 +37,15 @@ const Footer = () => {
       message: formData.message,
     };
 
-    client
-      .create(contact)
-      .then(() => {
-        setLoading(false);
-        setIsFormSubmitted(true);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    try {
+      await client.create(contact);
+      setStatus('Demo only: your message was not sent or stored.');
+    } catch {
+      setStatus('The demo could not be completed. Please try again.');
+    } finally {
+      submittingRef.current = false;
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,46 +66,51 @@ const Footer = () => {
           </a>
         </div>
       </div>
-      {!isFormSubmitted ? (
-        <div className="app__footer-form app__flex">
-          <div className="app__flex">
-            <input
-              className="p-text"
-              type="text"
-              placeholder="Your Name"
-              name="username"
-              value={username}
-              onChange={handleChangeInput}
-            />
-          </div>
-          <div className="app__flex">
-            <input
-              className="p-text"
-              type="email"
-              placeholder="Your Email"
-              name="email"
-              value={email}
-              onChange={handleChangeInput}
-            />
-          </div>
-          <div>
-            <textarea
-              className="p-text"
-              placeholder="Your Message"
-              value={message}
-              name="message"
-              onChange={handleChangeInput}
-            />
-          </div>
-          <button type="button" className="p-text" onClick={handleSubmit}>
-            {!loading ? 'Send Message' : 'Sending...'}
-          </button>
+      <p className="p-text">Demo only: messages are not sent or stored.</p>
+      <form className="app__footer-form app__flex" onSubmit={handleSubmit}>
+        <div className="app__flex">
+          <input
+            className="p-text"
+            type="text"
+            aria-label="Your Name"
+            required
+            disabled={loading}
+            placeholder="Your Name"
+            name="username"
+            value={username}
+            onChange={handleChangeInput}
+          />
         </div>
-      ) : (
+        <div className="app__flex">
+          <input
+            className="p-text"
+            type="email"
+            aria-label="Your Email"
+            required
+            disabled={loading}
+            placeholder="Your Email"
+            name="email"
+            value={email}
+            onChange={handleChangeInput}
+          />
+        </div>
         <div>
-          <h3 className="head-text">Thank you for getting in touch!</h3>
+          <textarea
+            className="p-text"
+            aria-label="Your Message"
+            required
+            disabled={loading}
+            placeholder="Your Message"
+            value={message}
+            name="message"
+            onChange={handleChangeInput}
+          />
         </div>
-      )}
+        <button type="submit" className="p-text" disabled={loading}>
+          {!loading ? 'Send Message' : 'Sending...'}
+        </button>
+        <p role="status" className="p-text">{status}</p>
+      </form>
     </>
   );
 };

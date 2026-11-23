@@ -63,7 +63,7 @@ This is a **React + Vite** frontend project (not Create React App). It is a one-
 ```bash
 portfolio-ui-7/
 ├── index.html              # Vite entry HTML (root)
-├── vite.config.js          # Vite + React plugin config
+├── vite.config.mjs         # Vite + React plugin config
 ├── vercel.json             # Vercel: framework, buildCommand, outputDirectory
 ├── package.json
 ├── .env.example             # Optional env vars (see Environment Variables)
@@ -95,7 +95,7 @@ portfolio-ui-7/
 │       ├── AppWrap.js       # HOC: layout + SocialMedia + NavigationDots + section id
 │       ├── MotionWrap.js    # HOC: Framer Motion scroll-in animation
 │       └── index.js
-└── backend_sanity_portfolio/  # Optional Sanity CMS schemas (not used by app at runtime)
+└── backend-sanity-portfolio/  # Optional Sanity CMS schemas (not used by app at runtime)
 ```
 
 ---
@@ -104,7 +104,7 @@ portfolio-ui-7/
 
 ### Prerequisites
 
-- **Node.js** >= 20 and < 25 (see `engines` in `package.json`)
+- **Node.js** 26.x (see `engines` in `package.json`)
 
 ### Install & Run
 
@@ -145,24 +145,9 @@ npm run lint:fix    # Auto-fix where possible
 
 The app runs **without any environment variables**. All content comes from `src/mockData.js`.
 
-If you want to document or later switch to a real backend (e.g. Sanity), you can use a `.env` file. Copy from `.env.example`:
+The current frontend has no Sanity connection; setting environment variables does not enable one. A real integration requires implementation and its own security review. Never place a private token in a `VITE_*` variable: those values can be exposed in the client bundle.
 
-```bash
-cp .env.example .env
-```
-
-**.env.example** documents optional variables (currently unused in code):
-
-| Variable                 | Purpose                                      |
-| ------------------------ | -------------------------------------------- |
-| `VITE_USE_MOCK_DATA`     | Force mock data (e.g. `true`)                |
-| `VITE_USE_SANITY`        | Opt-in to Sanity in production (e.g. `true`) |
-| `VITE_SANITY_PROJECT_ID` | Sanity project ID (for future use)           |
-| `VITE_SANITY_TOKEN`      | Sanity token (for future use)                |
-
-**Important:** Only variables prefixed with `VITE_` are exposed to the client bundle in Vite. Do not put secrets in `VITE_*` if they must stay server-only.
-
-For **Vercel**: you do not need to set any of these for the current mock-only setup. Build command is `npm run build`, output directory is `dist` (see `vercel.json`).
+For **Vercel**, the mock frontend needs no environment variables. Build command is `npm run build`, output directory is `dist` (see `vercel.json`).
 
 ---
 
@@ -174,7 +159,7 @@ For **Vercel**: you do not need to set any of these for the current mock-only se
 
 3. **Navigation:** The Navbar and `NavigationDots` use anchor links `#home`, `#about`, `#work`, `#skills`, `#testimonial`, `#contact`. These IDs are set by `AppWrap(Component, idName, classNames)` on the wrapper div.
 
-4. **Data:** Containers that need data call `client.fetch(query)` (or `client.create(...)` in Footer). The **client** in `src/client.js` is a mock implementation that resolves with data from `mockData.js`; there are no HTTP requests. `urlFor(source)` is a no-op that returns `source` (for compatibility with a possible future Sanity image helper).
+4. **Data:** Containers call the mock `client.fetch(query)` or `client.create(...)`; neither makes an HTTP request. Some images and the Google font are loaded from external hosts. `urlFor(source)` returns `source` unchanged.
 
 5. **Styling:** Global and section-specific SCSS are imported in `App.js` and in each container/component. BEM-like class names (`app__section-element`) are used for scoping.
 
@@ -223,7 +208,7 @@ There are **no external API endpoints**. The app uses an in-memory data layer in
 
 - **`client.fetch(query)`** — Returns a Promise that resolves with mock arrays keyed by query content (e.g. `abouts`, `works`, `skills`, `experiences`, `testimonials`, `brands`). Query format is Sanity-style (`*[_type == "abouts"]`) but not executed; the client only checks `query.includes('abouts')` etc.
 
-- **`client.create(payload)`** — Returns a Promise that resolves with a fake `{ _id }`. Used by the contact form in Footer; no data is sent anywhere.
+- **`client.create(payload)`** — Returns a simulated demo result. The contact form explicitly states that no message is sent or stored.
 
 - **`urlFor(source)`** — Returns `source` unchanged. Kept so that components can pass image references that would later be resolved by a Sanity image URL builder if you plug one in.
 
@@ -242,7 +227,7 @@ Data lives in **`src/mockData.js`**: `mockAbouts`, `mockWorks`, `mockSkills`, `m
 | **Work / Portfolio**       | Work                   | Grid of projects; filter by **All**, **UI/UX**, **Web App**, **Mobile App**, **React JS**. Each item: image, title, description, tag, links (view / code). |
 | **Skills & Experience**    | Skills                 | List of skills (icon, name) and timeline of experiences (year, works with name, company); tooltips on work items via `react-tooltip`.                      |
 | **Testimonials**           | Testimonial            | One testimonial at a time; prev/next buttons; brand logos below.                                                                                           |
-| **Contact**                | Footer                 | Email/phone links; form (name, email, message). Submit calls `client.create()` and shows a thank-you state (no real backend).                              |
+| **Contact**                | Footer                 | Email/phone links and a validated demo form; no message is sent or stored. |
 | **Animations**             | Framer Motion          | Scroll-in and hover effects in sections and cards.                                                                                                         |
 | **SEO**                    | index.html             | Meta title, description, author, keywords, Open Graph, Twitter Card, canonical URL.                                                                        |
 
@@ -250,7 +235,7 @@ Data lives in **`src/mockData.js`**: `mockAbouts`, `mockWorks`, `mockSkills`, `m
 
 ## Backend & Deployment
 
-- **Backend:** None required. The app is frontend-only and uses mock data. The optional `backend_sanity_portfolio/` folder contains Sanity schemas for reference only; the running app does not call Sanity.
+- **Backend:** None required. The app is frontend-only and uses mock data. The optional `backend-sanity-portfolio/` folder contains a separate Sanity Studio; the running frontend does not call it.
 
 - **Deployment (Vercel):**
   - Build: `npm run build`

@@ -6,8 +6,7 @@ This project is **React + Vite** (not Create React App). It uses mock data by de
 
 ## How It Works
 
-- **Production (e.g. Vercel)**: Uses mock data from `src/mockData.js` by default — no backend or CORS setup needed.
-- **Development**: Uses mock data unless you set `VITE_SANITY_PROJECT_ID` (and optionally `VITE_SANITY_TOKEN`) in `.env` for real Sanity data.
+- **Production and development**: Use mock data from `src/mockData.js`; the current frontend does not connect to Sanity.
 
 ## Mock Data Includes
 
@@ -47,7 +46,7 @@ This project is **React + Vite** (not Create React App). It uses mock data by de
 
 All frontend features remain intact:
 
-- ✅ Contact form (submissions are mocked but UI works)
+- ✅ Contact form clearly indicates that demo submissions are neither sent nor stored
 - ✅ All input fields functional
 - ✅ All CSS/SCSS styling unchanged
 - ✅ All animations and interactions
@@ -55,29 +54,14 @@ All frontend features remain intact:
 - ✅ Filter functionality in Works section
 - ✅ Testimonial navigation
 
-## Switching to Real Sanity Data (development only)
+## Connecting Real Sanity Data
 
-To use real Sanity CMS data locally:
-
-1. Create a `.env` file in the root directory.
-2. Add your Sanity credentials (use **Vite** env vars so they are embedded at build time):
-
-   ```
-   VITE_SANITY_PROJECT_ID=your_project_id
-   VITE_SANITY_TOKEN=your_token
-   ```
-
-3. Restart the dev server (`npm run dev`).
-
-The app will use Sanity when credentials are present in development.
+The frontend currently uses only the mock client. Connecting the optional Sanity Studio requires a separate implementation and security review; setting environment variables alone will not enable it. Never put a private token in a `VITE_*` variable, because client variables may be exposed in the browser.
 
 ## Production (e.g. Vercel)
 
 This project uses **React + Vite** (not Create React App). In production:
 
-- **Mock data is used by default** so the site works without a Sanity backend or CORS setup.
-- Do **not** set `VITE_SANITY_PROJECT_ID` (or `VITE_SANITY_TOKEN`) in Vercel if you want mock data.
-- To force mock data in production, you can set `VITE_USE_MOCK_DATA=true` in Vercel Environment Variables.
-- To use Sanity in production (and fix CORS on the Sanity project), set `VITE_USE_SANITY=true` and your Sanity env vars in Vercel.
+- **Mock data is always used** by the current frontend, without a Sanity backend or CORS setup.
 
 No backend or extra config is required for the default production deploy; the built app uses `src/mockData.js` so the portfolio loads correctly.

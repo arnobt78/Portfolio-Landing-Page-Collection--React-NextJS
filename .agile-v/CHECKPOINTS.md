@@ -9,5 +9,6 @@
 | PR 3 GitGuardian finding | ACCEPTED | C1-PR3-GITGUARDIAN-20261122 | User explicitly accepted the failed non-required check for the demo on 2026-11-23; PR 3 was squash-merged. Incident 27937045 was not classified in GitGuardian. |
 | Project 05 modernization plan | APPROVED | C1-P05-20261122 | User approved the scoped plan; project 05 is prepared separately after PR 3 merged. |
 | Project 06 modernization plan | APPROVED | C1-P06-20261123 | User approved the scoped project 06 plan. |
+| Project 07 frontend plan | APPROVED | C1-P07-20261123 | User approved frontend modernization; optional Sanity Studio migration is deferred. |
 
 This checkpoint approves the specified metadata cleanup and the project 04 and 01 implementation plan, including dependency installation. Deployment and release acceptance have not been approved.
