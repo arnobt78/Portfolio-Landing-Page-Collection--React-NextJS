@@ -131,7 +131,7 @@
     grid-column: 2;
     grid-row: 1 / 2;
   }
-  .site-header .header-social a { padding: 4px; }
+  .site-header .header-social a { padding: 6px; }
   .site-header .header-social svg { width: 32px; height: 32px; }
 }
 
