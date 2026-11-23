@@ -1,5 +1,7 @@
 # C1 security review
 
+Project 09's clean Node 26 audit reported zero vulnerabilities after updates. Its demo API still returns the same static public response; local image optimization is restricted to `/images/**` and quality 75, and requests for external and other local sources returned 400 in local tests. Vercel firewall and deployment settings were not changed.
+
 Project 08 uses browser-visible EmailJS configuration; it must not contain private credentials and does not replace provider-side abuse controls. Missing configuration and mocked provider failure preserve input; no live delivery was tested. Node 26 clean-install audit reported zero advisories. No Vercel firewall settings were changed.
 
 A limited scan of 1,341 Git-eligible text files up to 5 MiB found no high-confidence private-key, AWS access key, GitHub token, or Google API key patterns. This is not an exhaustive secret review. No eligible real `.env` files or generated dependency/build directories were found. No eligible files exceeded 50 MiB.

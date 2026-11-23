@@ -11,7 +11,7 @@ import { Layout } from '@/layout/Layout';
 export default function Home() {
   return (
     <Layout>
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 2rem', padding: '0 0 2rem' }}>
+      <section className="hero-grid">
         <Hero />
         <BackgroundAnimation />
       </section>

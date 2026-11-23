@@ -45,9 +45,6 @@ export const metadata: Metadata = {
       'Personal portfolio of John Doe — projects, technologies, and experience. Built with Next.js. By Arnob Mahmud.',
     siteName: "John Doe's Portfolio",
     locale: 'en_GB',
-    images: [
-      { url: 'og-image.png', width: 1200, height: 630, alt: "John Doe's Portfolio" },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -57,7 +54,6 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
   },
 };
 

@@ -37,17 +37,17 @@ export default function Hero() {
         The purpose of this portfolio is to help aspiring and established developers to take
         their development skills to the next level and build awesome apps.
       </p>
-      <button
-        type="button"
+      <a
+        href="#about"
         style={{
           width: 262, height: 64, marginBottom: 80, padding: '16px 24px',
           background: 'linear-gradient(270deg, #13ADC7 0%, #945DD6 100%)',
           color: '#fff', fontSize: '1.5rem', fontWeight: 600,
-          border: 'none', borderRadius: 50, cursor: 'pointer',
+          border: 'none', borderRadius: 50, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         }}
       >
         Learn More
-      </button>
+      </a>
     </div>
   );
 }
