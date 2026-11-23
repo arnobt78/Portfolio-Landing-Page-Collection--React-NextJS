@@ -135,7 +135,7 @@ npm install
 
 ### Optional: Contact form (EmailJS)
 
-To enable the contact form, create a `.env` file in the project root (see [Environment Variables](#environment-variables)). Without it, the form will throw when submitting; you can still run and explore the rest of the app.
+To enable the contact form, create a `.env` file in the project root (see [Environment Variables](#environment-variables)). Without the configuration, the form shows a message and keeps the entered text.
 
 ---
 
@@ -155,6 +155,7 @@ VITE_APP_EMAILJS_PUBLIC_KEY=your_public_key
 
 - Names **must** start with `VITE_` so Vite exposes them to the client.
 - In code they are read as `import.meta.env.VITE_APP_EMAILJS_*`.
+- These values are visible in the browser. Never put private API keys in `VITE_` variables; configure EmailJS provider-side abuse controls for public forms.
 
 ### How to get these values (EmailJS)
 

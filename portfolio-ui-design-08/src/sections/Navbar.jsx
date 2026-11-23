@@ -18,7 +18,7 @@ const NavItems = ({ onClick = () => {} }) => (
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => setIsOpen((open) => !open);
   const closeMenu = () => setIsOpen(false);
 
   return (
@@ -32,7 +32,10 @@ const Navbar = () => {
 
           <button
             onClick={toggleMenu}
-            className="text-neutral-400 hover:text-white focus:outline-none sm:hidden flex"
+            type="button"
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            className="text-neutral-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:hidden flex"
             aria-label="Toggle menu">
             <img src={isOpen ? 'assets/close.svg' : 'assets/menu.svg'} alt="toggle" className="w-6 h-6" />
           </button>
@@ -43,7 +46,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className={`nav-sidebar ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
+      <div id="mobile-navigation" inert={!isOpen ? '' : undefined} className={`nav-sidebar ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
         <nav className="p-5">
           <NavItems onClick={closeMenu} />
         </nav>
