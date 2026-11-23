@@ -1,8 +1,8 @@
 # Portfolio Landing Page 9 - Next.js, React, TypeScript, TailwindCSS Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-18.3-blue)](https://react.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4-blue)](https://tailwindcss.com/)
 
@@ -46,7 +46,7 @@ A modern, single-page portfolio template built with the Next.js App Router and T
 - **SEO** – Metadata and viewport in `layout.tsx` (title, description, Open Graph, Twitter, canonical, robots).
 - **Single-page sections** – Hero, Projects, Technologies, Timeline (About), Accomplishments, plus Header and Footer.
 - **Sample API** – `GET /api/hello` for backend or serverless.
-- **Linting** – ESLint with `eslint-config-next` and `next lint`.
+- **Linting** – ESLint with `eslint-config-next` and the ESLint CLI.
 
 ---
 
@@ -54,8 +54,8 @@ A modern, single-page portfolio template built with the Next.js App Router and T
 
 | Category   | Technology                                                       |
 | ---------- | ---------------------------------------------------------------- |
-| Framework  | Next.js 14 (App Router)                                          |
-| UI Library | React 18                                                         |
+| Framework  | Next.js 16 (App Router)                                          |
+| UI Library | React 19                                                         |
 | Language   | TypeScript 5                                                     |
 | Styling    | Tailwind CSS 3, inline styles, `app/globals.css`                 |
 | Fonts      | Next.js font (Space Grotesk via `next/font/google`)              |
@@ -100,7 +100,7 @@ portfolio-ui-9/
 ├── public/
 ├── next.config.js
 ├── tsconfig.json
-├── .eslintrc.json
+├── eslint.config.mjs
 └── package.json
 ```
 
@@ -110,7 +110,7 @@ portfolio-ui-9/
 
 ### Prerequisites
 
-- **Node.js** 18.x or 20.x (LTS recommended)
+- **Node.js** 26.x
 - **npm** (or yarn / pnpm)
 
 ### Installation
@@ -164,7 +164,7 @@ To add env-based config later:
 | `npm run dev`   | Start dev server at [http://localhost:3000](http://localhost:3000) |
 | `npm run build` | Production build (output in `.next`)                               |
 | `npm run start` | Run production server (run `build` first)                          |
-| `npm run lint`  | Run ESLint (`next lint`)                                           |
+| `npm run lint`  | Run ESLint                                           |
 
 ---
 
@@ -235,7 +235,7 @@ Decorative SVG with motion paths. Uses `anim-fade-right` for scroll-in from the 
 
 ### NavDropDown
 
-Dropdown panel (e.g. contact links). Used where a nav item opens a menu; styling is self-contained.
+An optional, self-contained dropdown panel; it is not currently used by the header.
 
 ---
 
@@ -246,7 +246,7 @@ Animations are **CSS-only** (no Framer Motion for visibility). A small hook and 
 - **`src/hooks/useScrollReveal.ts`** – Uses `IntersectionObserver`; when an element is in view (default 10–15% visible), it adds the class `visible` to that element. One-shot (observer disconnects after reveal).
 - **`src/app/globals.css`** – Defines:
   - **Keyframes:** `fadeUp`, `fadeDown`, `fadeLeft`, `fadeRight`, `scaleIn`, `fadeRotate`.
-  - **Classes:** `.anim-fade-up`, `.anim-fade-down`, `.anim-fade-left`, `.anim-fade-right`, `.anim-scale-in`, `.anim-fade-rotate` — each starts with `opacity: 0` and, when `.visible` is added, runs the matching animation (forwards).
+  - **Classes:** `.anim-fade-up`, `.anim-fade-down`, `.anim-fade-left`, `.anim-fade-right`, `.anim-scale-in`, `.anim-fade-rotate` — content remains visible without JavaScript; `.visible` starts the matching animation.
   - **Stagger:** `.stagger-children.visible > *` — children run `fadeUp` with increasing `animation-delay` (e.g. 0.05s, 0.12s, …).
 
 Usage in a component:
@@ -288,7 +288,7 @@ To customize: edit the `metadata` and `viewport` exports in `src/app/layout.tsx`
 
 ## Conclusion
 
-This repo is a **single-page portfolio** on Next.js 14 (App Router) and TypeScript. It uses Tailwind for base styles and inline styles for section layout so content is aligned and visible. Scroll-triggered CSS animations (and the `useScrollReveal` hook) make sections and cards appear smoothly from different directions. You can use it as a learning base or clone and edit constants, metadata, and copy for your own site.
+This repo is a **single-page portfolio** on Next.js 16 (App Router) and TypeScript. It uses Tailwind for base styles and inline styles for section layout so content is aligned and visible. Scroll-triggered CSS animations (and the `useScrollReveal` hook) make sections and cards appear smoothly from different directions. You can use it as a learning base or clone and edit constants, metadata, and copy for your own site.
 
 ---
 

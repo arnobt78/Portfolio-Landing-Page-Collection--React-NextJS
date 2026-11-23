@@ -23,7 +23,7 @@ const sectionTitle: React.CSSProperties = {
 };
 const grid: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 400px), 1fr))',
   padding: '3rem 0',
   placeItems: 'center',
   columnGap: '2rem',

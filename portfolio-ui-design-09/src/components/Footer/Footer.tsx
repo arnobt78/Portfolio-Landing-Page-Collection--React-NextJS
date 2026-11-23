@@ -11,7 +11,7 @@ export default function Footer() {
         style={{
           listStyle: 'none', margin: 0, padding: '40px 0 28px',
           borderTop: '1px solid rgba(255,255,255,0.1)',
-          display: 'grid', gridTemplateColumns: 'repeat(3, minmax(85px, 220px))', gap: 40,
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 40,
         }}
       >
         <li style={{ display: 'flex', flexDirection: 'column' }}>

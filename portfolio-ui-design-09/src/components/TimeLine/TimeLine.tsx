@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { TimeLineData } from '@/constants/constants';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
@@ -17,34 +17,6 @@ const divider: React.CSSProperties = {
 };
 
 export default function Timeline() {
-  const [activeItem, setActiveItem] = useState(0);
-  const carouselRef = useRef<HTMLUListElement>(null);
-
-  const scroll = (node: HTMLUListElement | null, left: number) => {
-    if (node) node.scrollTo({ left, behavior: 'smooth' });
-  };
-
-  const handleClick = (e: React.MouseEvent, i: number) => {
-    e.preventDefault();
-    if (carouselRef.current) {
-      const scrollLeft = Math.floor(carouselRef.current.scrollWidth * 0.7 * (i / TimeLineData.length));
-      scroll(carouselRef.current, scrollLeft);
-    }
-  };
-
-  const handleScroll = () => {
-    if (carouselRef.current) {
-      const index = Math.round((carouselRef.current.scrollLeft / (carouselRef.current.scrollWidth * 0.7)) * TimeLineData.length);
-      setActiveItem(index);
-    }
-  };
-
-  useEffect(() => {
-    const handleResize = () => scroll(carouselRef.current, 0);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const sectionRef = useScrollReveal<HTMLElement>(0.1);
 
   return (
@@ -55,24 +27,26 @@ export default function Timeline() {
         development skills to the next level and build awesome apps.
       </p>
       <ul
-        ref={carouselRef}
-        onScroll={handleScroll}
+        tabIndex={0}
+        aria-label="Career timeline; scroll horizontally to see all years"
         style={{
           listStyle: 'none', margin: '0 0 80px 32px', padding: 0,
-          display: 'flex', justifyContent: 'space-between',
-          scrollbarWidth: 'none',
+          display: 'flex', justifyContent: 'space-between', gap: '2rem', overflowX: 'auto',
+          scrollbarWidth: 'thin',
         }}
       >
-        {TimeLineData.map((item, index) => (
+        {TimeLineData.map((item) => (
           <li
-            key={index}
-            role="button"
-            tabIndex={0}
-            onClick={(e) => handleClick(e, index)}
-            onKeyDown={(e) => e.key === 'Enter' && handleClick(e as unknown as React.MouseEvent, index)}
-            style={{ maxWidth: 196, cursor: 'pointer', background: '#0F1624', borderRadius: 3 }}
+            key={item.year}
+            style={{ flex: '0 0 196px', background: '#0F1624', borderRadius: 3 }}
           >
-            <h4
+            <button type="button" className="timeline-item" onClick={(event) => {
+              event.currentTarget.closest('li')?.scrollIntoView({
+                block: 'nearest', inline: 'nearest',
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+              });
+            }}>
+            <span
               style={{
                 fontWeight: 700, fontSize: 24, lineHeight: '32px', letterSpacing: '0.02em',
                 display: 'flex', alignItems: 'center',
@@ -90,10 +64,11 @@ export default function Timeline() {
                   </linearGradient>
                 </defs>
               </svg>
-            </h4>
-            <p style={{ fontSize: 14, lineHeight: '22px', letterSpacing: '0.02em', color: 'rgba(255,255,255,0.75)', paddingRight: 16 }}>
+            </span>
+            <span style={{ display: 'block', fontSize: 14, lineHeight: '22px', letterSpacing: '0.02em', color: 'rgba(255,255,255,0.75)', paddingRight: 16 }}>
               {item.text}
-            </p>
+            </span>
+            </button>
           </li>
         ))}
       </ul>

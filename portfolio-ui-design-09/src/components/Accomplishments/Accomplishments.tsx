@@ -25,7 +25,7 @@ export default function Accomplishments() {
   return (
     <section ref={ref} className="anim-scale-in" style={{ padding: '32px 0 0' }}>
       <h2 style={sectionTitle}>Personal Achievements</h2>
-      <div className="stagger-children" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, margin: '24px 0' }}>
+      <div className="stagger-children" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))', gap: 24, margin: '24px 0' }}>
         {data.map((card, index) => (
           <div key={index} style={box}>
             <h5 style={{ fontWeight: 600, fontSize: 36, lineHeight: '40px', letterSpacing: '0.01em', color: 'white', marginBottom: 8, margin: '0 0 8px' }}>

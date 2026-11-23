@@ -34,7 +34,7 @@ export default function Technologies() {
       <p style={{ maxWidth: 800, fontSize: 'clamp(16px, 2vw, 24px)', lineHeight: 1.6, fontWeight: 300, paddingBottom: '3.6rem', color: 'rgba(255,255,255,0.5)' }}>
         I&apos;ve worked with a range of technologies in the web development world. From Back-end To Design
       </p>
-      <ul className="stagger-children" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.5rem' }}>
+      <ul className="stagger-children" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '2.5rem' }}>
         {items.map(({ Icon, title, text }) => (
           <li key={title} style={{ maxWidth: 320, display: 'flex', flexDirection: 'column' }}>
             <div style={{ marginBottom: 8 }}><Icon size={48} /></div>
