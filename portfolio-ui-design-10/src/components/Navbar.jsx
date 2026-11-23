@@ -3,7 +3,7 @@ import { links } from '../data';
 // Navbar: site branding + anchor links from data.jsx; key={id} required for list items
 const Navbar = () => {
   return (
-    <nav className='bg-emerald-100'>
+    <nav className='bg-emerald-100' aria-label='Main navigation'>
       <div className='align-element py-4 flex flex-col sm:flex-row sm:gap-x-16 sm:items-center sm:py-8'>
         <h2 className='text-3xl font-bold'>
           Web<span className='text-emerald-600'>Dev</span>

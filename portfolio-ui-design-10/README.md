@@ -1,8 +1,8 @@
 # Portfolio Landing Page 10 - React, Vite, JavaScript, TailwindCSS Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-6.2.0-green)](https://vite.dev/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-green)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.19-38bdf8)](https://tailwindcss.com/)
 [![ESLint](https://img.shields.io/badge/ESLint-9.15-4b32c3)](https://eslint.org/)
 
@@ -39,7 +39,7 @@ A single-page portfolio site built with React, Vite, JavaScript, and Tailwind CS
 
 This project is a **static, client-side only** portfolio landing page. There is no backend server or API—all content is driven by in-app data and component props. It demonstrates:
 
-- React 18 function components and composition
+- React 19 function components and composition
 - Vite for fast development and optimized production builds
 - Tailwind CSS for responsive, utility-first styling
 - Component-based architecture with reusable UI pieces
@@ -51,8 +51,8 @@ This project is a **static, client-side only** portfolio landing page. There is 
 
 | Technology           | Purpose                                 |
 | -------------------- | --------------------------------------- |
-| **React 18.3**       | UI components and rendering             |
-| **Vite 6**           | Build tool, dev server, HMR             |
+| **React 19**       | UI components and rendering             |
+| **Vite 8**           | Build tool, dev server, HMR             |
 | **Tailwind CSS 3.4** | Utility-first CSS                       |
 | **PostCSS**          | Tailwind processing, autoprefixer       |
 | **ESLint 9**         | Linting (flat config)                   |
@@ -98,7 +98,7 @@ This project is a **static, client-side only** portfolio landing page. There is 
 
 ### Prerequisites
 
-- **Node.js** 18+ (recommended: LTS)
+- **Node.js** 26.x
 - **npm** (comes with Node) or **yarn** / **pnpm**
 
 ### Installation
@@ -346,3 +346,5 @@ If you have any questions or want to share your work, reach out via GitHub or my
 **Enjoy building and learning!** 🚀
 
 Thank you! 😊
+
+Project images are loaded from Pexels; a fallback appears if an image cannot be loaded. Social and project links are demonstration placeholders.
