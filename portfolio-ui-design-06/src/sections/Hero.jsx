@@ -170,17 +170,17 @@ export const Hero = () => {
           <div className="relative overflow-hidden">
             {/* Edge fades hide the seam where the duplicated marquee content loops */}
             <div
-              className="absolute left-0 top-0 bottom-0 w-32
+              className="skills-marquee-fade absolute left-0 top-0 bottom-0 w-32
              bg-gradient-to-r from-background to-transparent z-10"
             />
             <div
-              className="absolute right-0 top-0 bottom-0 w-32
+              className="skills-marquee-fade absolute right-0 top-0 bottom-0 w-32
              bg-gradient-to-l from-background to-transparent z-10"
             />
-            <div className="flex animate-marquee">
+            <div className="skills-marquee flex animate-marquee">
               {/* Duplicate skills array so marquee can scroll -50% and loop seamlessly */}
               {[...skills, ...skills].map((skill, idx) => (
-                <div key={idx} className="flex-shrink-0 px-8 py-4">
+                <div key={idx} aria-hidden={idx >= skills.length} className={`flex-shrink-0 px-8 py-4 ${idx >= skills.length ? "skills-marquee-duplicate" : ""}`}>
                   <span className="text-xl font-semibold text-muted-foreground/50 hover:text-muted-foreground transition-colors">
                     {skill}
                   </span>

@@ -33,6 +33,16 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  .skills-marquee {
+    flex-wrap: wrap;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .skills-marquee-duplicate, .skills-marquee-fade {
+    display: none;
+  }
 }
 
 @layer base {

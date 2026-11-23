@@ -111,8 +111,8 @@ portfolio-ui-6/
 ### Install
 
 ```bash
-git clone <your-repo-url>
-cd portfolio-ui-design-06
+git clone https://github.com/arnobt78/Portfolio-Landing-Page-Collection--React-NextJS.git
+cd Portfolio-Landing-Page-Collection--React-NextJS/portfolio-ui-design-06
 npm install
 ```
 

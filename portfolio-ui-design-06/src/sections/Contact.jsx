@@ -199,26 +199,24 @@ export const Contact = () => {
                 )}
               </Button>
 
-              {/* Success or error message after submit; styled via submitStatus.type */}
-              {submitStatus.type && (
-                <div
-                  role={submitStatus.type === "error" ? "alert" : "status"}
-                  className={`flex items-center gap-3
-                     p-4 rounded-xl ${
-                       submitStatus.type === "success"
-                         ? "bg-green-500/10 border border-green-500/20 text-green-400"
-                         : "bg-red-500/10 border border-red-500/20 text-red-400"
-                     }`}
-                >
-                  {submitStatus.type === "success" ? (
-                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  )}
-                  <p className="text-sm">{submitStatus.message}</p>
-                </div>
-              )}
             </form>
+              {/* Keep live regions mounted so assistive technology can announce updates. */}
+              <div role="status" className="empty:absolute">
+                {submitStatus.type === "success" && (
+                  <div className="flex items-center gap-3 mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
+              </div>
+              <div role="alert" className="empty:absolute">
+                {submitStatus.type === "error" && (
+                  <div className="flex items-center gap-3 mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
+              </div>
           </div>
 
           {/* Contact Info */}
