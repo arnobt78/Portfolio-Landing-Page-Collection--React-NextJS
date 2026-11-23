@@ -24,6 +24,27 @@
   --color-surface: #1a2329;
 }
 
+/* Keep the page usable for visitors who request reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .skills-marquee {
+    flex-wrap: wrap;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .skills-marquee-duplicate, .skills-marquee-fade {
+    display: none;
+  }
+}
+
 @layer base {
   /* Enables smooth scroll when clicking #anchor links (e.g. #about, #contact) */
   html {

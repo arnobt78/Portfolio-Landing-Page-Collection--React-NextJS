@@ -7,7 +7,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/Button";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 
 const contactInfo = [
@@ -39,6 +39,7 @@ export const Contact = () => {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const submittingRef = useRef(false);
   const [submitStatus, setSubmitStatus] = useState({
     type: null, // 'success' or 'error'
     message: "",
@@ -46,6 +47,9 @@ export const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // A ref also blocks duplicate submissions before React rerenders the button.
+    if (submittingRef.current) return;
+    submittingRef.current = true;
 
     setIsLoading(true);
     setSubmitStatus({ type: null, message: "" });
@@ -69,7 +73,7 @@ export const Contact = () => {
           email: formData.email,
           message: formData.message,
         },
-        publicKey,
+        { publicKey },
       );
 
       setSubmitStatus({
@@ -77,14 +81,14 @@ export const Contact = () => {
         message: "Message sent successfully! I'll get back to you soon.",
       });
       setFormData({ name: "", email: "", message: "" });
-    } catch (error) {
-      console.error("EmailJS error:", error);
+    } catch {
       setSubmitStatus({
         type: "error",
         message:
-          error.text || "Failed to send message. Please try again later.",
+          "Failed to send message. Please try again later.",
       });
     } finally {
+      submittingRef.current = false;
       setIsLoading(false);
     }
   };
@@ -127,6 +131,7 @@ export const Contact = () => {
                   id="name"
                   type="text"
                   required
+                  disabled={isLoading}
                   placeholder="Your name..."
                   value={formData.name}
                   onChange={(e) =>
@@ -147,6 +152,7 @@ export const Contact = () => {
                   id="email"
                   type="email"
                   required
+                  disabled={isLoading}
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -164,8 +170,10 @@ export const Contact = () => {
                   Message
                 </label>
                 <textarea
+                  id="message"
                   rows={5}
                   required
+                  disabled={isLoading}
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
@@ -191,25 +199,24 @@ export const Contact = () => {
                 )}
               </Button>
 
-              {/* Success or error message after submit; styled via submitStatus.type */}
-              {submitStatus.type && (
-                <div
-                  className={`flex items-center gap-3
-                     p-4 rounded-xl ${
-                       submitStatus.type === "success"
-                         ? "bg-green-500/10 border border-green-500/20 text-green-400"
-                         : "bg-red-500/10 border border-red-500/20 text-red-400"
-                     }`}
-                >
-                  {submitStatus.type === "success" ? (
-                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  )}
-                  <p className="text-sm">{submitStatus.message}</p>
-                </div>
-              )}
             </form>
+              {/* Keep live regions mounted so assistive technology can announce updates. */}
+              <div role="status" className="empty:absolute">
+                {submitStatus.type === "success" && (
+                  <div className="flex items-center gap-3 mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
+              </div>
+              <div role="alert" className="empty:absolute">
+                {submitStatus.type === "error" && (
+                  <div className="flex items-center gap-3 mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
+              </div>
           </div>
 
           {/* Contact Info */}

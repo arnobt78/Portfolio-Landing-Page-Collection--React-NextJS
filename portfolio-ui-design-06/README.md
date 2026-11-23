@@ -1,11 +1,11 @@
 # Portfolio Landing Page 6 - React, Vite, JavaScript, TailwindCSS Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-19.2.0-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-7.2.5-green)](https://vite.dev/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-green)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1.17-blueviolet)](https://tailwindcss.com/)
-[![EmailJS](https://img.shields.io/badge/EmailJS-4.4.1-orange)](https://www.emailjs.com/)
-[![Lucide React](https://img.shields.io/badge/Lucide%20React-0.556-888)](https://lucide.dev/)
+[![EmailJS](https://img.shields.io/badge/EmailJS-5-orange)](https://www.emailjs.com/)
+[![Lucide React](https://img.shields.io/badge/Lucide%20React-0.577-888)](https://lucide.dev/)
 
 A modern, single-page portfolio template built with **React 19**, **Vite**, **JavaScript**, and **Tailwind CSS 4**. It features a dark theme with glassmorphism, smooth scroll navigation, a contact form powered by **EmailJS**, and reusable UI components. Use it as a learning resource, a starter for your own portfolio, or as a reference for React patterns and Tailwind theming.
 
@@ -105,20 +105,20 @@ portfolio-ui-6/
 
 ### Prerequisites
 
-- **Node.js** 18+ (recommended: 20+)
+- **Node.js** 26.x
 - **npm** (or yarn/pnpm)
 
 ### Install
 
 ```bash
-git clone <your-repo-url>
-cd portfolio-ui-6
+git clone https://github.com/arnobt78/Portfolio-Landing-Page-Collection--React-NextJS.git
+cd Portfolio-Landing-Page-Collection--React-NextJS/portfolio-ui-design-06
 npm install
 ```
 
 ### Optional: Contact form (EmailJS)
 
-To enable the contact form, create a `.env` file in the project root (see [Environment Variables](#environment-variables)). Without it, the form will show a configuration error when submitted.
+To enable the contact form, create a `.env` file in the project root (see [Environment Variables](#environment-variables)). Without it, submission shows an error and retains the entered message.
 
 ---
 
@@ -287,7 +287,7 @@ To reuse in another project: copy `index.css` (or the `@theme` block and the lay
 ## API & Backend
 
 - **No custom backend.** The app is a static SPA.
-- **EmailJS**: The only “API” used is EmailJS’s client SDK. `Contact.jsx` calls `emailjs.send(serviceId, templateId, templateParams, publicKey)`. All credentials come from `import.meta.env.VITE_*`.
+- **EmailJS**: The only “API” used is EmailJS’s client SDK. `Contact.jsx` calls `emailjs.send(serviceId, templateId, templateParams, { publicKey })`. Its client configuration comes from `import.meta.env.VITE_*`.
 - **Assets**: Images (e.g. `/hero-bg.jpg`, `/profile-photo.jpg`, `/projects/project1.png`) are expected in `public/` or deployed alongside the app. Testimonials use external Unsplash URLs.
 
 ---
@@ -297,7 +297,7 @@ To reuse in another project: copy `index.css` (or the `@theme` block and the lay
 - **No React Router.** Single HTML page; “routes” are section IDs.
 - **Anchors**: `#about`, `#projects`, `#experience`, `#testimonials`, `#contact`.
 - **Smooth scroll**: Enabled globally in `index.css` with `html { scroll-behavior: smooth; }`.
-- **Navbar**: “Contact Me” can point to `#contact`; you can change the href in `Navbar.jsx` and in the Hero CTA to `#contact` if desired.
+- **Navbar and hero**: “Contact Me” links navigate to `#contact`.
 
 ---
 
@@ -309,7 +309,7 @@ To reuse in another project: copy `index.css` (or the `@theme` block and the lay
 import { Button } from "@/components/Button";
 import { ArrowRight } from "lucide-react";
 
-<Button size="lg">
+<Button size="lg" href="#contact">
   Contact Me <ArrowRight className="w-5 h-5" />
 </Button>;
 ```
@@ -331,7 +331,7 @@ await emailjs.send(
     email: formData.email,
     message: formData.message,
   },
-  publicKey,
+  { publicKey },
 );
 ```
 
