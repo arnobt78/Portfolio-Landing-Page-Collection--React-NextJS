@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { HiMenuAlt4, HiX } from 'react-icons/hi';
 import { motion } from 'framer-motion';
 
@@ -8,6 +8,7 @@ import './Navbar.scss';
 // Top bar: logo + desktop nav links; on small screens, hamburger opens a slide-in menu with same #hash links.
 const Navbar = () => {
   const [toggle, setToggle] = useState(false);
+  const menuButtonRef = useRef(null);
 
   return (
     <nav className="app__navbar">
@@ -26,7 +27,7 @@ const Navbar = () => {
 
       {/* Mobile: hamburger (HiMenuAlt4) toggles overlay; HiX closes; links close menu on click. */}
       <div className="app__navbar-menu">
-        <button type="button" aria-label="Open navigation" aria-expanded={toggle} aria-controls="mobile-navigation" className="app__navbar-toggle" onClick={() => setToggle(true)}>
+        <button ref={menuButtonRef} type="button" aria-label="Open navigation" aria-expanded={toggle} aria-controls="mobile-navigation" className="app__navbar-toggle" onClick={() => setToggle(true)}>
           <HiMenuAlt4 />
         </button>
 
@@ -36,7 +37,7 @@ const Navbar = () => {
             whileInView={{ x: [300, 0] }}
             transition={{ duration: 0.85, ease: 'easeOut' }}
           >
-            <button type="button" aria-label="Close navigation" className="app__navbar-close" onClick={() => setToggle(false)}><HiX /></button>
+            <button type="button" aria-label="Close navigation" className="app__navbar-close" onClick={() => { setToggle(false); menuButtonRef.current?.focus(); }}><HiX /></button>
             <ul>
               {['home', 'about', 'work', 'skills', 'contact'].map((item) => (
                 <li key={item}>
