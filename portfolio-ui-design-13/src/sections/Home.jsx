@@ -63,11 +63,12 @@ const Home = React.forwardRef((props, ref) => {
   /* Typing effect: type forward, pause at end, then delete and switch to next role in cycle. */
   useEffect(() => {
     const current = roles[index];
+    let pause;
     const timeout = setTimeout(
       () => {
         if (!deleting && subIndex < current.length) setSubIndex((v) => v + 1);
         else if (!deleting && subIndex === current.length)
-          setTimeout(() => setDeleting(true), 1200);
+          pause = setTimeout(() => setDeleting(true), 1200);
         else if (deleting && subIndex > 0) setSubIndex((v) => v - 1);
         else if (deleting && subIndex === 0) {
           setDeleting(false);
@@ -76,7 +77,7 @@ const Home = React.forwardRef((props, ref) => {
       },
       deleting ? 40 : 60,
     ); // original typing speed
-    return () => clearTimeout(timeout);
+    return () => { clearTimeout(timeout); clearTimeout(pause); };
   }, [subIndex, deleting, index, roles]);
 
   return (

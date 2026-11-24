@@ -50,3 +50,6 @@ Project 1's Vercel CLI is a development dependency. The remaining advisories are
 
 
 Project 12: npm audit reports zero advisories after its upgrade. EmailJS identifiers in Vite environment variables are public browser configuration, not secrets; configure allowed origins and usage limits with the provider before enabling delivery. Live service restrictions and production deployment are unverified. No API, SSR, or Next.js image optimizer was found.
+
+
+Project 13: npm audit reports zero advisories after modernization. EmailJS VITE identifiers are browser-visible and must not contain secrets; allowed origins and provider usage controls require separate configuration and were not verified. Contact submissions were mocked and production settings were not changed. The project contains no application API or Next.js image optimizer.

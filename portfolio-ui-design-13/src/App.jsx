@@ -2,7 +2,7 @@
  * Root layout: single-page portfolio. Renders intro (until onFinish), then all sections in order.
  * introDone state controls whether IntroAnimation is shown; Home receives it for optional reveal logic.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IntroAnimation from "./components/IntroAnimation";
 import Navbar from "./components/Navbar";
 import CustomCursor from "./components/CustomCursor";
@@ -18,6 +18,14 @@ import MusicPlayer from "./components/MusicPlayer";
 
 export default function App() {
   const [introDone, setIntroDone] = useState(false);
+
+  // React mounts the section anchors after the browser's initial hash lookup.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!["home", "about", "skills", "projects", "experience", "testimonials", "contact"].includes(id)) return;
+    const frame = requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "instant" }));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <div className="relative animated-gradient text-white">

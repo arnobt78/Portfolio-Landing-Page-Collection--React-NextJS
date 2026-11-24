@@ -1,10 +1,10 @@
 /**
  * Contact: form (name, email, service, budget, idea) with client-side validation.
  * If VITE_SERVICE_ID, VITE_TEMPLATE_ID, and VITE_PUBLIC_KEY are set, submits via EmailJS; otherwise shows "demo mode" message.
- * budget: only digits allowed (regex in handleChange). Required fields: name, email, service, idea; budget required unless service is "other".
+ * budget: only digits allowed (regex in handleChange). Required fields: name, email, service, idea; budget required unless service is "Others".
  */
 // Importing React's useState hook for managing component state
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 // Importing motion component from Framer Motion for animations
 import { motion } from "framer-motion";
@@ -18,12 +18,11 @@ import ParticlesBackground from "../components/ParticlesBackground.jsx";
 // Importing the contact image asset
 import Astra from "../assets/Astra.png";
 
-// Reading EmailJS credentials from environment variables (Vite)
-const SERVICE_ID = import.meta.env.VITE_SERVICE_ID;
-const TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID;
-const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
-
 export default function Contact() {
+  // These identifiers are public browser configuration, not private credentials.
+  const SERVICE_ID = import.meta.env.VITE_SERVICE_ID;
+  const TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID;
+  const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,18 +33,19 @@ export default function Contact() {
 
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("");
+  const sending = useRef(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "budget" && value && !/^\d+$/.test(value)) return;
 
-    setFormData((p) => ({ ...p, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value, ...(name === "service" && value === "Others" ? { budget: "" } : {}) }));
 
     if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
   };
 
-  /* Validates required fields and budget (required unless service is "other"); returns true if valid. */
+  /* Validates required fields and budget (required unless service is "Others"); returns true if valid. */
   const validateForm = () => {
     const required = ["name", "email", "service", "idea"];
     const newErrors = {};
@@ -54,7 +54,7 @@ export default function Contact() {
       (f) => !formData[f].trim() && (newErrors[f] = "Fill this field"),
     );
 
-    if (formData.service !== "other" && !formData.budget.trim())
+    if (formData.service !== "Others" && !formData.budget.trim())
       newErrors.budget = "Fill this field";
 
     setErrors(newErrors);
@@ -68,13 +68,14 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (sending.current || !validateForm()) return;
 
     if (!hasEmailJsConfig) {
       setStatus("demo");
       return;
     }
 
+    sending.current = true;
     setStatus("sending");
 
     try {
@@ -86,14 +87,15 @@ export default function Contact() {
           from_name: formData.name,
           reply_to: formData.email,
         },
-        PUBLIC_KEY,
+        { publicKey: PUBLIC_KEY },
       );
 
       setStatus("success");
       setFormData({ name: "", email: "", service: "", budget: "", idea: "" });
-    } catch (err) {
-      console.error("EmailJS Error:", err);
+    } catch {
       setStatus("error");
+    } finally {
+      sending.current = false;
     }
   };
 
@@ -116,6 +118,7 @@ export default function Contact() {
         >
           <motion.img
             src={Astra}
+            loading="lazy"
             alt="Contact"
             className="w-72 md:w-140 rounded-2xl shadow-lg object-cover"
             animate={{ y: [0, -10, 0] }}
@@ -135,12 +138,17 @@ export default function Contact() {
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             {/* Name field */}
             <div className="flex flex-col">
-              <label className="mb-1">
+              <label htmlFor="name" className="mb-1">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="name"
+                id="name"
+                aria-required="true"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                disabled={status === "sending"}
                 placeholder="Your Name"
                 value={formData.name}
                 onChange={handleChange}
@@ -149,18 +157,23 @@ export default function Contact() {
                 } text-white focus:outline-none focus:border-blue-500`}
               />
               {errors.name && (
-                <p className="text-red-500 text-xs">{errors.name}</p>
+                <p id="name-error" className="text-red-500 text-xs">{errors.name}</p>
               )}
             </div>
 
             {/* Email field */}
             <div className="flex flex-col">
-              <label className="mb-1">
+              <label htmlFor="email" className="mb-1">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
                 name="email"
+                id="email"
+                aria-required="true"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
+                disabled={status === "sending"}
                 placeholder="Your Email"
                 value={formData.email}
                 onChange={handleChange}
@@ -169,18 +182,23 @@ export default function Contact() {
                 } text-white focus:outline-none focus:border-blue-500`}
               />
               {errors.email && (
-                <p className="text-red-500 text-xs">{errors.email}</p>
+                <p id="email-error" className="text-red-500 text-xs">{errors.email}</p>
               )}
             </div>
 
             {/* Service dropdown */}
             <div className="flex flex-col">
-              <label className="mb-1">
+              <label htmlFor="service" className="mb-1">
                 Service Needed <span className="text-red-500">*</span>
               </label>
 
               <select
                 name="service"
+                id="service"
+                aria-required="true"
+                aria-invalid={Boolean(errors.service)}
+                aria-describedby={errors.service ? "service-error" : undefined}
+                disabled={status === "sending"}
                 value={formData.service}
                 onChange={handleChange}
                 className={`p-3 rounded-md bg-white/10 border ${
@@ -202,20 +220,25 @@ export default function Contact() {
               </select>
 
               {errors.service && (
-                <p className="text-red-500 text-xs">{errors.service}</p>
+                <p id="service-error" className="text-red-500 text-xs">{errors.service}</p>
               )}
             </div>
 
             {/* Budget field */}
-            {formData.service && formData.service !== "other" && (
+            {formData.service && formData.service !== "Others" && (
               <div className="flex flex-col">
-                <label className="mb-1">
+                <label htmlFor="budget" className="mb-1">
                   Budget <span className="text-red-500">*</span>
                 </label>
 
                 <input
                   type="text"
                   name="budget"
+                  id="budget"
+                aria-required="true"
+                aria-invalid={Boolean(errors.budget)}
+                aria-describedby={errors.budget ? "budget-error" : undefined}
+                  disabled={status === "sending"}
                   placeholder="Your Budget"
                   value={formData.budget}
                   onChange={handleChange}
@@ -225,19 +248,24 @@ export default function Contact() {
                 />
 
                 {errors.budget && (
-                  <p className="text-red-500 text-xs">{errors.budget}</p>
+                  <p id="budget-error" className="text-red-500 text-xs">{errors.budget}</p>
                 )}
               </div>
             )}
 
             {/* Idea textarea */}
             <div className="flex flex-col">
-              <label className="mb-1">
+              <label htmlFor="idea" className="mb-1">
                 Idea <span className="text-red-500">*</span>
               </label>
 
               <textarea
                 name="idea"
+                id="idea"
+                aria-required="true"
+                aria-invalid={Boolean(errors.idea)}
+                aria-describedby={errors.idea ? "idea-error" : undefined}
+                disabled={status === "sending"}
                 rows={5}
                 placeholder="Enter your idea"
                 value={formData.idea}
@@ -248,13 +276,13 @@ export default function Contact() {
               />
 
               {errors.idea && (
-                <p className="text-red-500 text-xs">{errors.idea}</p>
+                <p id="idea-error" className="text-red-500 text-xs">{errors.idea}</p>
               )}
             </div>
 
             {/* Status message */}
             {status && (
-              <p
+              <p role="status" aria-live="polite"
                 className={`text-sm ${
                   status === "success"
                     ? "text-green-400"

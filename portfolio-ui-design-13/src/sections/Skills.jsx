@@ -5,7 +5,7 @@
 import {FaJava , FaReact} from 'react-icons/fa';
 import {SiNextdotjs, SiTypescript, SiTailwindcss, SiFastapi, SiPython, SiDocker, SiMongodb, SiAngular} from 'react-icons/si';
 import {DiNodejsSmall} from 'react-icons/di';
-import { motion, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 
@@ -29,6 +29,7 @@ const skills = [
 const repeated = [...skills , ...skills]
 
 const [dir , setDir] = useState(-1);   /* scroll direction: 1 or -1 */
+const reducedMotion = useReducedMotion();
 const [active , setActive] = useState(false); /* true when section is in view (carousel runs) */
 const sectionRef = useRef(null);
 const trackRef = useRef(null);  /* used to read track width for loop wrap */
@@ -42,7 +43,7 @@ if(!el) return;
 
 const io = new IntersectionObserver((
   [entry]) => {
-    setActive(entry.isIntersecting && entry.intersectionRatio > 0.1);
+    setActive(entry.isIntersecting && entry.intersectionRatio >= 0.1);
   }, 
 { threshold : [0.1 ] }
 )
@@ -76,6 +77,7 @@ useEffect(()=> {
 
 /* Animation loop: move track by SPEED * dir per second; wrap position when it exceeds half track width for seamless loop. */
 useEffect(()=> {
+  if (!active || reducedMotion) return;
   let id;
   let last = performance.now();
   const SPEED = 80;
@@ -95,7 +97,7 @@ useEffect(()=> {
   }
   id = requestAnimationFrame(tick)
   return () => cancelAnimationFrame(id);
-}, [dir , x]);
+}, [active, dir, reducedMotion, x]);
 
 
   return(

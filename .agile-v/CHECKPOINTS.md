@@ -17,4 +17,6 @@
 
 | Project 12 modernization plan | APPROVED | C1-P12-20261124 | User approved the scoped project 12 plan on 2026-11-24. |
 
+| Project 13 modernization plan | APPROVED | C1-P13-20261125 | See APPROVALS.md for user approval. |
+
 This checkpoint approves the specified metadata cleanup and the project 04 and 01 implementation plan, including dependency installation. Deployment and release acceptance have not been approved.

@@ -1,8 +1,8 @@
 # Portfolio Landing Page 13 – React, Vite, JavaScript, TailwindCSS Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-19.1-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-7.x-646CFF)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-19.3-blue)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC)](https://tailwindcss.com/)
 
 A **single-page portfolio** built with React, Vite, JavaScript, and Tailwind CSS. It showcases a full landing experience: hero with typing roles, about, skills carousel, scroll-driven project cards, experience timeline, testimonials, and a contact form powered by EmailJS. The project is intended for **learning and reuse**—clone it, customize content and styling, and deploy your own portfolio or use individual components in other apps.
@@ -57,7 +57,7 @@ A **single-page portfolio** built with React, Vite, JavaScript, and Tailwind CSS
 | Category       | Technology                                                     |
 | -------------- | -------------------------------------------------------------- |
 | **Framework**  | React 19.x                                                     |
-| **Build tool** | Vite 7.x                                                       |
+| **Build tool** | Vite 8.x                                                       |
 | **Styling**    | Tailwind CSS 4.x (`@tailwindcss/vite`)                         |
 | **Animation**  | Framer Motion 12.x, GSAP 3.x (MorphSVG for intro)              |
 | **Icons**      | react-icons (Fa, Fi, Si, Di)                                   |
@@ -107,7 +107,7 @@ portfolio-ui-13/
 
 ### Prerequisites
 
-- **Node.js** 18+ (recommended: 20+)
+- **Node.js** 26.x
 - **npm** (or yarn/pnpm)
 
 ### Install and run
@@ -164,7 +164,7 @@ VITE_TEMPLATE_ID=your_template_id
 VITE_PUBLIC_KEY=your_public_key
 ```
 
-Vite only exposes variables prefixed with `VITE_` to the client. Restart the dev server after changing `.env`.
+Vite exposes variables prefixed with `VITE_` in the browser, so these EmailJS identifiers are public. Configure allowed origins and usage limits with EmailJS. Restart the dev server after changing `.env`.
 
 ### Optional: Deploy (e.g. Vercel)
 
@@ -180,6 +180,7 @@ Add the same three variables in your host’s “Environment Variables” for th
 | `npm run build`   | Production build → `dist/` |
 | `npm run preview` | Serve `dist/` locally      |
 | `npm run lint`    | Run ESLint on the project  |
+| `npm test`        | Run the focused tests      |
 
 ---
 
