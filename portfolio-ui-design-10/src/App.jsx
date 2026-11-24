@@ -9,10 +9,12 @@ const App = () => {
   return (
     <>
       <Navbar />
-      <Hero />
-      <Skills />
-      <About />
-      <Projects />
+      <main>
+        <Hero />
+        <Skills />
+        <About />
+        <Projects />
+      </main>
     </>
   );
 };

@@ -1,5 +1,7 @@
 # C1 security review
 
+Project 10's clean Node 26 dependency audit reported zero advisories after updates. It is a client-side Vite site without an application API or image optimization endpoint. Project images are fetched directly from Pexels in visitors' browsers; availability and third-party traffic remain external dependencies. No Vercel settings were changed.
+
 Project 09's clean Node 26 audit reported zero vulnerabilities after updates. Its demo API still returns the same static public response; local image optimization is restricted to `/images/**` and quality 75, and requests for external and other local sources returned 400 in local tests. Vercel firewall and deployment settings were not changed.
 
 Project 08 uses browser-visible EmailJS configuration; it must not contain private credentials and does not replace provider-side abuse controls. Missing configuration and mocked provider failure preserve input; no live delivery was tested. Node 26 clean-install audit reported zero advisories. No Vercel firewall settings were changed.
