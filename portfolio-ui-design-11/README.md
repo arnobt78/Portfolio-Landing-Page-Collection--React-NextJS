@@ -1,8 +1,8 @@
 # Portfolio Landing Page 11 - React, Vite, JavaScript, Bootstrap Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-19.2.4-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-7.3.1-646CFF)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-19.3.1-blue)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.3.8-646CFF)](https://vitejs.dev/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.8-7952B3)](https://getbootstrap.com/)
 
 A single-page portfolio template built with React and Vite. It includes a hero banner, skills carousel, project showcase with tabs, contact form (backed by an Express + Nodemailer API), and a newsletter signup (Mailchimp). Use it as a learning reference, a starter for your own portfolio, or as a teaching example for React, Vite, and a simple Node.js backend.
@@ -37,8 +37,8 @@ A single-page portfolio template built with React and Vite. It includes a hero b
 
 Portfolio UI 11 is a **single-page portfolio** that demonstrates:
 
-- **Frontend:** React 19 with Vite 7, Bootstrap 5, and custom CSS. Sections: Navbar, Banner (hero with typing effect), Skills (carousel), Projects (tabs + cards), Contact (form), and Footer (newsletter + social links).
-- **Backend (optional):** Express server with a `/contact` POST endpoint that sends emails via Nodemailer (Gmail). The frontend posts to `http://localhost:5000/contact` when the contact form is submitted.
+- **Frontend:** React 19 with Vite 8, Bootstrap 5, and custom CSS. Sections: Navbar, Banner (hero with typing effect), Skills (carousel), Projects (tabs + cards), Contact (form), and Footer (newsletter + social links).
+- **Backend (optional):** Express server with a `/contact` POST endpoint that sends emails via Nodemailer (Gmail). The frontend uses `VITE_CONTACT_API_URL` when set; development defaults to `http://localhost:5000/contact`.
 - **Newsletter:** Footer uses `react-mailchimp-subscribe`; signup is driven by Mailchimp env vars.
 
 The app uses **hash-based in-page navigation** (e.g. `#home`, `#skills`, `#projects`, `#connect`) via `react-router-hash-link` and `BrowserRouter`, so it works as a single HTML page suitable for static hosting (e.g. Vercel) while the backend can be deployed separately.
@@ -49,7 +49,7 @@ The app uses **hash-based in-page navigation** (e.g. `#home`, `#skills`, `#proje
 
 | Layer      | Technology                                   |
 | ---------- | -------------------------------------------- |
-| Build tool | Vite 7                                       |
+| Build tool | Vite 8                                       |
 | UI library | React 19                                     |
 | Styling    | Bootstrap 5, custom CSS (App.css, index.css) |
 | Icons      | react-bootstrap-icons                        |
@@ -98,7 +98,7 @@ portfolio-ui-11/
 
 ## Getting Started
 
-**Prerequisites:** Node.js (LTS recommended), npm or yarn.
+**Prerequisites:** Node.js 26.x, npm or yarn.
 
 1. **Clone and install**
 
@@ -117,7 +117,7 @@ portfolio-ui-11/
    npm run dev
    ```
 
-   Open <http://localhost:5173>. The contact form will fail without the backend; newsletter will only work after setting Mailchimp env vars.
+   Open <http://localhost:5173>. The contact form requires the backend; newsletter signup requires Mailchimp configuration. Unconfigured services show a message.
 
 4. **Run backend (contact form)**
 
@@ -141,9 +141,12 @@ Used by the Mailchimp newsletter in the footer. Get these from your Mailchimp au
 
 | Variable             | Description                                                                      |
 | -------------------- | -------------------------------------------------------------------------------- |
-| `VITE_MAILCHIMP_URL` | Mailchimp form action URL (e.g. `https://...list-manage.com/subscribe/post?...)` |
+| `VITE_CONTACT_API_URL` | Full contact API endpoint URL; set an explicit HTTPS URL for production. |
+| `VITE_MAILCHIMP_URL` | Trusted HTTPS Mailchimp form action URL ending in `/subscribe/post`. |
 | `VITE_MAILCHIMP_U`   | Mailchimp user/list identifier (`u=...`)                                         |
 | `VITE_MAILCHIMP_ID`  | Mailchimp list/audience ID (`id=...`)                                            |
+
+Vite variables are public. The Mailchimp integration uses JSONP, which executes script from the configured origin; use only a trusted provider URL.
 
 **How to get them:** Mailchimp → Audience → Signup forms → Embedded forms → copy the form’s `action` URL and parse `u` and `id` from the query string.
 
@@ -157,6 +160,7 @@ Used by the Express server for sending contact-form emails via Gmail.
 | `EMAIL_PASS` | Gmail App Password (not your normal password). [Create one](https://myaccount.google.com/apppasswords) with 2FA enabled. |
 | `EMAIL_TO`   | (Optional) Where contact form submissions are sent. Defaults to `EMAIL_USER`.                                            |
 | `PORT`       | (Optional) Server port. Defaults to `5000`.                                                                              |
+| `CORS_ALLOWED_ORIGINS` | (Optional) Comma-separated browser origin allowlist; unset allows all origins. |
 
 **Summary:** For contact form only, set `EMAIL_USER`, `EMAIL_PASS`, and optionally `EMAIL_TO` and `PORT`. For newsletter only, set the three `VITE_MAILCHIMP_*` variables. For both, set all of them.
 
@@ -189,7 +193,7 @@ Used by the Express server for sending contact-form emails via Gmail.
 - **Banner (hero):** Headline, rotating typing text (Web Developer / Web Designer / UI/UX Designer), short intro, CTA. Uses `react-on-screen` and `animate.css` for scroll-in effects.
 - **Skills:** Carousel of skill items (e.g. Web Development, Brand Identity, Logo Design) with responsive breakpoints (mobile → desktop).
 - **Projects:** Tabs (Tab 1/2/3); Tab 1 shows a grid of project cards (image + title + description). Other tabs show placeholder text. Easy to replace with real projects.
-- **Contact form:** First name, last name, email, phone, message. On submit, POSTs JSON to `http://localhost:5000/contact`. Success/error message shown below form. Requires backend and `.env` email config.
+- **Contact form:** First name, last name, email, phone, message. On submit, POSTs JSON to the configured contact endpoint (localhost by default in development). Success/error message shown below form. Requires backend and `.env` email config.
 - **Footer:** Mailchimp newsletter (email input, submit, status messages) and social links. Newsletter requires `VITE_MAILCHIMP_*` in `.env`.
 
 ---
@@ -222,7 +226,7 @@ Used by the Express server for sending contact-form emails via Gmail.
 
 ### Contact (`src/components/Contact.js`)
 
-- Controlled form with `formDetails` (firstName, lastName, email, phone, message). `handleSubmit` does `fetch("http://localhost:5000/contact", { method: "POST", body: JSON.stringify(formDetails), headers: { "Content-Type": "application/json;charset=utf-8" } })`, then sets success/error status. For production, replace the URL with your deployed API.
+- Controlled contact form preserves inputs on failure, prevents duplicate submissions and uses `VITE_CONTACT_API_URL` for the deployed endpoint.
 - **Reuse:** Copy the form and submit logic; point `fetch` to your own endpoint and adjust fields if needed.
 
 ### Footer, MailchimpForm, Newsletter (`Footer.js`, `MailchimpForm.js`, `Newsletter.js`)
@@ -240,10 +244,10 @@ The backend is a single Express app in `server.js` (ES modules).
 **Endpoint:** `POST /contact`
 
 - **Request body (JSON):** `firstName`, `lastName`, `email`, `phone`, `message`
-- **Response:** JSON. On success: `{ code: 200, status: "Message Sent" }`. On error: Nodemailer error object (e.g. `EAUTH` if credentials are wrong).
-- **Behavior:** Reads `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_TO` (optional) from `process.env`, creates a Nodemailer Gmail transport, and sends an HTML email to `EMAIL_TO` with the form data. CORS is enabled for all origins (`cors()`).
+- **Response:** JSON. On success: `{ code: 200, status: "Message Sent" }`. Invalid input returns 400 or 413; unavailable configuration returns 503 and provider failure returns a generic 502.
+- **Behavior:** Validates bounded input and sends a plain-text email from the configured Gmail address, with the visitor email as reply-to. An optional origin allowlist controls browser CORS; it is permissive when unset. CORS is not abuse prevention: configure shared/provider-side rate controls before exposing the endpoint publicly.
 
-**Run:** `node server.js` or `npm run server`. Ensure `.env` has valid Gmail App Password and that the frontend’s fetch URL matches the server (e.g. `http://localhost:5000` in dev, or your production API URL).
+**Run:** `node server.js` or `npm run server`. Ensure `.env` has valid Gmail App Password and that the frontend’s fetch URL matches the server (e.g. `http://localhost:5000` in dev, or set `VITE_CONTACT_API_URL` to your production endpoint).
 
 ---
 
@@ -303,3 +307,5 @@ This is an **open-source project** - feel free to use, enhance, and extend this 
 If you have any questions or want to share your work, reach out via GitHub or my portfolio at [https://www.arnobmahmud.com](https://www.arnobmahmud.com).
 
 **Enjoy building and learning!** 🚀
+
+The carousel is pinned to 2.8.5: version 2.8.6 adds npm as a production dependency with reported advisories. Reassess the pin when an updated release is available.

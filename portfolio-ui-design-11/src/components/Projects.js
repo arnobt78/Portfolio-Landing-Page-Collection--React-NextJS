@@ -5,7 +5,7 @@ import projImg2 from "../assets/img/project-img2.png";
 import projImg3 from "../assets/img/project-img3.png";
 import colorSharp2 from "../assets/img/color-sharp2.png";
 import "animate.css";
-import TrackVisibility from "react-on-screen";
+import TrackVisibility from "./Visibility";
 
 // Projects section: tabbed layout; first tab shows a grid of ProjectCards. Replace the projects array with your own data.
 export const Projects = () => {
@@ -92,8 +92,7 @@ export const Projects = () => {
                           })}
                         </Row>
                       </Tab.Pane>
-                      {/* Note: second tab uses eventKey="section" (Nav has "second"); you can align these for extra tabs. */}
-                      <Tab.Pane eventKey="section">
+                      <Tab.Pane eventKey="second">
                         <p>
                           Lorem ipsum dolor sit amet consectetur adipisicing
                           elit. Cumque quam, quod neque provident velit, rem

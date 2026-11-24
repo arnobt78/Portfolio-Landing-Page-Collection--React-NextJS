@@ -3,7 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import headerImg from "../assets/img/header-img.svg";
 import { ArrowRightCircle } from "react-bootstrap-icons";
 import "animate.css";
-import TrackVisibility from "react-on-screen";
+import TrackVisibility from "./Visibility";
 
 // Text options for the typing effect; ROTATE_PERIOD = pause (ms) when text is fully shown before deleting.
 const ROTATE_TEXTS = ["Web Developer", "Web Designer", "UI/UX Designer"];
@@ -15,8 +15,18 @@ export const Banner = () => {
   const [isDeleting, setIsDeleting] = useState(false); // True when backspacing.
   const [text, setText] = useState("");           // Currently visible substring.
   const [delta, setDelta] = useState(250);         // Interval (ms) between character add/remove; speeds up when deleting.
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
 
   useEffect(() => {
+    const query = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!query) return;
+    const update = (event) => setReducedMotion(event.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
     const tick = () => {
       let i = loopNum % ROTATE_TEXTS.length;
       let fullText = ROTATE_TEXTS[i];
@@ -27,7 +37,7 @@ export const Banner = () => {
       setText(updatedText);
 
       if (isDeleting) {
-        setDelta((prevDelta) => prevDelta / 2);
+        setDelta(80);
       }
 
       if (!isDeleting && updatedText === fullText) {
@@ -47,7 +57,7 @@ export const Banner = () => {
     return () => {
       clearInterval(ticker);
     };
-  }, [text, delta, isDeleting, loopNum]);
+  }, [text, delta, isDeleting, loopNum, reducedMotion]);
 
   return (
     <section className="banner" id="home">
@@ -71,7 +81,7 @@ export const Banner = () => {
                       data-period="1000"
                       data-rotate='[ "Web Developer", "Web Designer", "UI/UX Designer" ]'
                     >
-                      <span className="wrap">{text}</span>
+                      <span className="wrap">{reducedMotion ? ROTATE_TEXTS[0] : text}</span>
                     </span>
                   </h1>
                   <p>
@@ -81,9 +91,9 @@ export const Banner = () => {
                     when an unknown printer took a galley of type and scrambled
                     it to make a type specimen book.
                   </p>
-                  <button onClick={() => console.log("connect")}>
+                  <a className="connect-link" href="#connect">
                     Let’s Connect <ArrowRightCircle size={25} />
-                  </button>
+                  </a>
                 </div>
               )}
             </TrackVisibility>

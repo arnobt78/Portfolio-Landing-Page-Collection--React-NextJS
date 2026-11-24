@@ -1,5 +1,7 @@
 # C1 security review
 
+Project 11 contact requests now use bounded input validation, plain-text mail and generic errors; the sender is configured server-side. Clean Node 26 audit reported zero advisories. `CORS_ALLOWED_ORIGINS` can restrict browser origins but defaults to wildcard for compatibility and does not prevent direct requests; no shared/provider rate limit is implemented, so a publicly exposed configured SMTP endpoint needs upstream abuse controls. Mailchimp uses JSONP and its configured HTTPS endpoint must be trusted. Tests used synthetic data and transports, not real services or Vercel settings.
+
 Project 10's clean Node 26 dependency audit reported zero advisories after updates. It is a client-side Vite site without an application API or image optimization endpoint. Project images are fetched directly from Pexels in visitors' browsers; availability and third-party traffic remain external dependencies. No Vercel settings were changed.
 
 Project 09's clean Node 26 audit reported zero vulnerabilities after updates. Its demo API still returns the same static public response; local image optimization is restricted to `/images/**` and quality 75, and requests for external and other local sources returned 400 in local tests. Vercel firewall and deployment settings were not changed.

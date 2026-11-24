@@ -1,62 +1,59 @@
-import "dotenv/config";
+import { pathToFileURL } from "node:url";
 import express from "express";
 import cors from "cors";
 import nodemailer from "nodemailer";
 
-const router = express.Router();
+// The transport can be supplied by tests without connecting to an SMTP service.
+export function createContactApp({ sendMail, emailUser, emailTo, allowedOrigins = [] }) {
+  const app = express();
+  app.disable("x-powered-by");
+  app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : "*" }));
+  app.use(express.json({ limit: "16kb" }));
 
-// Express app: used to send contact form emails via Gmail (Nodemailer).
-const app = express();
-app.use(cors()); // Allow frontend (e.g. localhost:5173) to call this API.
-app.use(express.json()); // Parse JSON request bodies.
-app.use("/", router);
+  app.post("/contact", async (req, res) => {
+    const raw = req.body;
+    const body = raw && typeof raw === "object" && !Array.isArray(raw)
+      ? { ...raw, phone: raw.phone ?? "" }
+      : null;
+    const limits = { firstName: 100, lastName: 100, email: 254, phone: 40, message: 5000 };
+    if (!body ||
+      Object.entries(limits).some(([key, max]) => typeof body[key] !== "string" || body[key].length > max) ||
+      !body.firstName.trim() || !body.lastName.trim() || !body.message.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return res.status(400).json({ error: "Please provide valid contact details." });
+    }
+    if (!emailUser || !emailTo || !sendMail) {
+      return res.status(503).json({ error: "Contact service is not configured." });
+    }
 
-const PORT = process.env.PORT || 5000;
-const EMAIL_USER = process.env.EMAIL_USER; // Gmail address; use App Password in EMAIL_PASS.
-const EMAIL_PASS = process.env.EMAIL_PASS;
-const EMAIL_TO = process.env.EMAIL_TO || EMAIL_USER; // Where contact submissions are sent.
-
-app.listen(PORT, () => console.log(`Server Running on port ${PORT}`));
-
-// Nodemailer transport: Gmail SMTP. Requires EMAIL_USER and EMAIL_PASS in .env.
-const contactEmail = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: EMAIL_USER,
-    pass: EMAIL_PASS,
-  },
-});
-
-// Optional: verify SMTP connection on startup (logs error or "Ready to Send").
-contactEmail.verify((error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("Ready to Send");
-  }
-});
-
-// POST /contact — receives JSON from frontend contact form and sends one email.
-router.post("/contact", (req, res) => {
-  const name = req.body.firstName + req.body.lastName;
-  const email = req.body.email;
-  const message = req.body.message;
-  const phone = req.body.phone;
-  const mail = {
-    from: name,
-    to: EMAIL_TO,
-    subject: "Contact Form Submission - Portfolio",
-    html: `<p>Name: ${name}</p>
-           <p>Email: ${email}</p>
-           <p>Phone: ${phone}</p>
-           <p>Message: ${message}</p>`,
-  };
-  // Send email; respond with error object or success payload (frontend checks result.code === 200).
-  contactEmail.sendMail(mail, (error) => {
-    if (error) {
-      res.json(error);
-    } else {
-      res.json({ code: 200, status: "Message Sent" });
+    try {
+      await sendMail({
+        from: emailUser,
+        to: emailTo,
+        replyTo: body.email,
+        subject: "Contact Form Submission - Portfolio",
+        text: `Name: ${body.firstName.trim()} ${body.lastName.trim()}\nEmail: ${body.email}\nPhone: ${body.phone.trim()}\nMessage: ${body.message.trim()}`,
+      });
+      return res.json({ code: 200, status: "Message Sent" });
+    } catch {
+      return res.status(502).json({ error: "Unable to send your message. Please try again later." });
     }
   });
-});
+
+  app.use((err, req, res, next) => {
+    if (res.headersSent) return next(err);
+    return res.status(err.status === 413 ? 413 : 400).json({ error: "Invalid request body." });
+  });
+  return app;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await import("dotenv/config");
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  const emailTo = process.env.EMAIL_TO || emailUser;
+  const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
+  const transport = emailUser && emailPass && nodemailer.createTransport({ service: "gmail", auth: { user: emailUser, pass: emailPass } });
+  const app = createContactApp({ emailUser, emailTo, allowedOrigins, sendMail: transport && ((mail) => transport.sendMail(mail)) });
+  app.listen(process.env.PORT || 5000, () => console.log("Contact server is listening."));
+}

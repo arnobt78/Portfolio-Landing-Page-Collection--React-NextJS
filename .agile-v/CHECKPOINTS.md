@@ -13,5 +13,6 @@
 | Project 08 modernization plan | APPROVED | C1-P08-20261123 | User approved the scoped implementation plan. |
 | Project 09 modernization plan | APPROVED | C1-P09-20261124 | User approved the scoped implementation plan. |
 | Project 10 modernization plan | APPROVED | C1-P10-20261124 | User approved the scoped implementation plan. |
+| Project 11 modernization plan | APPROVED | C1-P11-20261124 | User approved the scoped implementation plan. |
 
 This checkpoint approves the specified metadata cleanup and the project 04 and 01 implementation plan, including dependency installation. Deployment and release acceptance have not been approved.

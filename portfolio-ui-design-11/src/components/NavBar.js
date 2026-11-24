@@ -14,6 +14,7 @@ export const NavBar = () => {
 
   const [activeLink, setActiveLink] = useState('home'); // Tracks which nav link is active for styling.
   const [scrolled, setScrolled] = useState(false);   // True after user scrolls 50px; toggles .scrolled class.
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -31,16 +32,17 @@ export const NavBar = () => {
 
   const onUpdateActiveLink = (value) => {
     setActiveLink(value);
+    setExpanded(false);
   }
 
   return (
     <Router>
-      <Navbar expand="md" className={scrolled ? "scrolled" : ""}>
+      <Navbar expand="md" expanded={expanded} onToggle={setExpanded} className={scrolled ? "scrolled" : ""}>
         <Container>
           <Navbar.Brand href="/">
             <img src={logo} alt="Logo" />
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav">
+          <Navbar.Toggle aria-label="Toggle navigation" aria-controls="basic-navbar-nav" aria-expanded={expanded}>
             <span className="navbar-toggler-icon"></span>
           </Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
@@ -49,17 +51,17 @@ export const NavBar = () => {
               <Nav.Link href="#skills" className={activeLink === 'skills' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('skills')}>Skills</Nav.Link>
               <Nav.Link href="#projects" className={activeLink === 'projects' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('projects')}>Projects</Nav.Link>
             </Nav>
-            <span className="navbar-text">
+            <div className="navbar-text">
               <div className="social-icon">
-                <a href="#"><img src={navIcon1} alt="" /></a>
-                <a href="#"><img src={navIcon2} alt="" /></a>
-                <a href="#"><img src={navIcon3} alt="" /></a>
+                <a href="#" aria-label="LinkedIn (demo link)"><img src={navIcon1} alt="" /></a>
+                <a href="#" aria-label="Facebook (demo link)"><img src={navIcon2} alt="" /></a>
+                <a href="#" aria-label="Instagram (demo link)"><img src={navIcon3} alt="" /></a>
               </div>
               {/* HashLink scrolls to #connect (contact section) without full page reload. */}
-              <HashLink to='#connect'>
-                <button className="vvd"><span>Let’s Connect</span></button>
+              <HashLink to='#connect' className="vvd" onClick={() => setExpanded(false)}>
+                <span>Let’s Connect</span>
               </HashLink>
-            </span>
+            </div>
           </Navbar.Collapse>
         </Container>
       </Navbar>

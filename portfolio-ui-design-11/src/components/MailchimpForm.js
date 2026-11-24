@@ -1,22 +1,31 @@
 import MailchimpSubscribe from "react-mailchimp-subscribe";
 import { Newsletter } from "./Newsletter";
 
-// Wraps Mailchimp signup: builds post URL from VITE_MAILCHIMP_* env vars and passes subscribe/status/message to Newsletter via render prop.
+// Mailchimp uses JSONP; the public URL must be a trusted HTTPS form endpoint.
+function getPostUrl() {
+  const { VITE_MAILCHIMP_URL: base, VITE_MAILCHIMP_U: user, VITE_MAILCHIMP_ID: id } = import.meta.env;
+  if (!base || !user || !id) return null;
+  try {
+    const url = new URL(base);
+    if (url.protocol !== "https:" || !url.pathname.endsWith("/post")) return null;
+    url.searchParams.set("u", user);
+    url.searchParams.set("id", id);
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export const MailchimpForm = () => {
-  const postUrl = `${import.meta.env.VITE_MAILCHIMP_URL}?u=${import.meta.env.VITE_MAILCHIMP_U}&id=${import.meta.env.VITE_MAILCHIMP_ID}`;
+  const postUrl = getPostUrl();
+  if (!postUrl) return <Newsletter configured={false} />;
 
   return (
-    <>
-      <MailchimpSubscribe
-        url={postUrl}
-        render={({ subscribe, status, message }) => (
-          <Newsletter
-            status={status}
-            message={message}
-            onValidated={(formData) => subscribe(formData)}
-          />
-        )}
-      />
-    </>
+    <MailchimpSubscribe
+      url={postUrl}
+      render={({ subscribe, status, message }) => (
+        <Newsletter configured status={status} message={message} onValidated={subscribe} />
+      )}
+    />
   );
 };
