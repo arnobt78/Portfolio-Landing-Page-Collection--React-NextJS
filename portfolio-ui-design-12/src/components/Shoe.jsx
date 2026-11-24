@@ -68,6 +68,3 @@ export default function Shoe({ color, ...props }) {
     </group>
   );
 }
-
-/* Preload the model so it's ready when the Product Design tab is shown. */
-useGLTF.preload("/shoe.gltf");

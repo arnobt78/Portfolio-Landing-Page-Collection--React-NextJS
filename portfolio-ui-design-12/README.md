@@ -1,10 +1,10 @@
-# Portfolio Landing Page 13 - React, Vite, JavaScript, Three.js Frontend Project
+# Portfolio Landing Page 12 - React, Vite, JavaScript, Three.js Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Vite](https://img.shields.io/badge/Vite-6.2-646CFF)](https://vitejs.dev/)
-[![React](https://img.shields.io/badge/React-18.2-blue)](https://react.dev/)
-[![Three.js](https://img.shields.io/badge/Three.js-0.168-green)](https://threejs.org/)
-[![styled-components](https://img.shields.io/badge/styled--components-5.3-DB7093)](https://styled-components.com/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF)](https://vite.dev/)
+[![React](https://img.shields.io/badge/React-19.3-blue)](https://react.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.187-green)](https://threejs.org/)
+[![styled-components](https://img.shields.io/badge/styled--components-6.6-DB7093)](https://styled-components.com/)
 
 A single-page portfolio showcase built with React, Vite, JavaScript, and Three.js. It demonstrates scroll-snap sections, 3D visuals with React Three Fiber, a contact form with EmailJS, and a world map with react-simple-maps. Use it as a template for learning modern front-end tooling or as a base for your own portfolio.
 
@@ -44,8 +44,8 @@ This project is a **front-end-only** portfolio landing page. It has no backend; 
 
 | Category       | Technology                                                                   |
 | -------------- | ---------------------------------------------------------------------------- |
-| Build tool     | Vite 6                                                                       |
-| UI library     | React 18                                                                     |
+| Build tool     | Vite 8                                                                       |
+| UI library     | React 19                                                                     |
 | Styling        | styled-components                                                            |
 | 3D rendering   | Three.js, @react-three/fiber, @react-three/drei, @react-three/postprocessing |
 | Maps           | react-simple-maps                                                            |
@@ -93,7 +93,7 @@ portfolio-ui-12/
 
 ### Prerequisites
 
-- **Node.js** 18+ (or 20+ recommended)
+- **Node.js** 26.x
 - **npm** (or yarn/pnpm)
 
 ### Install and run
@@ -120,44 +120,15 @@ npm run preview
 
 ## Environment Variables
 
-The app does **not** read environment variables by default. The contact form in `Contact.jsx` uses **EmailJS** with placeholder IDs:
+The contact form uses the following public EmailJS identifiers. Set them in an ignored `.env` file or in the build environment:
 
-```javascript
-emailjs.sendForm(
-  "service_id", // Replace with your EmailJS Service ID
-  "template_id", // Replace with your EmailJS Template ID
-  ref.current,
-  "public_key", // Replace with your EmailJS Public Key
-);
+```env
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
-To keep keys out of the repo and support different environments:
-
-1. **Create a `.env` file** in the project root (`.env` is already in `.gitignore` so it won’t be committed):
-
-   ```env
-   VITE_EMAILJS_SERVICE_ID=your_service_id
-   VITE_EMAILJS_TEMPLATE_ID=your_template_id
-   VITE_EMAILJS_PUBLIC_KEY=your_public_key
-   ```
-
-2. **Use them in code** (e.g. in `Contact.jsx`):
-
-   ```javascript
-   import.meta.env.VITE_EMAILJS_SERVICE_ID;
-   import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-   import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-   ```
-
-3. **Get EmailJS values**: Sign up at [https://www.emailjs.com/](https://www.emailjs.com/), create a service, a template, and copy Service ID, Template ID, and Public Key.
-
-4. **Optional**: Add a `.env.example` (no real values) so others know which variables are needed:
-
-   ```env
-   VITE_EMAILJS_SERVICE_ID=
-   VITE_EMAILJS_TEMPLATE_ID=
-   VITE_EMAILJS_PUBLIC_KEY=
-   ```
+These values are included in the browser build and must not contain private credentials. Configure permitted origins and service limits in EmailJS. When they are missing, the form reports that it is not configured and does not send a request.
 
 ---
 
@@ -167,6 +138,7 @@ To keep keys out of the repo and support different environments:
 | ----------------- | --------------------------- |
 | `npm run dev`     | Start Vite dev server (HMR) |
 | `npm run build`   | Production build → `dist/`  |
+| `npm test`        | Run contact form tests      |
 | `npm run preview` | Serve `dist/` locally       |
 | `npm run lint`    | Run ESLint on `src/`        |
 
@@ -256,7 +228,7 @@ Root layout: a full-height scroll container with background image and four secti
 - **Cube / Atom**: Drop into any R3F `<Canvas>`; they are self-contained. Adjust materials and text in Cube, or curve/line params in Atom.
 - **Shoe / Mac**: Use in any `<Canvas>`; ensure the GLB/GLTF URL matches your `public/` assets. You can pass `position`/`scale` via props.
 - **Map**: Use `Map.jsx` as-is or change `projectionConfig`, `fill`/`stroke`, and `Annotation` coordinates/labels. Keep `features.json` in `public/` (or point `geography` to another URL).
-- **Contact form**: Replace EmailJS IDs with your own (or env vars). Same pattern works with other form endpoints if you replace `emailjs.sendForm` with `fetch` to your API.
+- **Contact form**: Configure your public EmailJS identifiers using environment variables. Same pattern works with other form endpoints if you replace `emailjs.sendForm` with `fetch` to your API.
 
 ---
 

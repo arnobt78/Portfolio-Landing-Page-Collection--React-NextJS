@@ -1,3 +1,4 @@
+import VisualBoundary from "./VisualBoundary";
 import React, { Suspense } from "react";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -28,12 +29,12 @@ const Desc = styled.div`
 const Development = () => {
   return (
     <>
-      <Canvas camera={{ position: [0, 0, 10] }}>
+      <VisualBoundary><Canvas fallback={<p role="status">3D visual unavailable.</p>} camera={{ position: [0, 0, 10] }}>
         <Suspense fallback={null}>
           <Atom />
           <OrbitControls enableZoom={false} autoRotate />
         </Suspense>
-      </Canvas>
+      </Canvas></VisualBoundary>
       <Desc>
         We design products with a strong focus on both world class design and
         ensuring your product is a market success.

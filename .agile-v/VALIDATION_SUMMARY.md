@@ -72,3 +72,13 @@ Node 22.22.3, npm 12.0.2. Each project was attempted with `npm ci --no-audit --n
 | 21 | install: TIMEOUT |
 
 The earlier consolidation did not include browser checks; limited follow-up headless Chrome checks for projects 1 through 3 are described above. Accessibility and production deployment have not been verified. No production deployment is claimed. EvalGate: NOT RUN; Gate 2 and release acceptance are not approved.
+
+
+## Project 12 modernization (2026-11-24)
+
+REQ-0005 and REQ-0007–0009: Node 26.13.1 clean install, lint, three contact tests, Vite 8 production build and dependency check passed. npm audit decreased from 16 findings (12 high) to zero. Vite reports a 1.16 MB minified initial 3D bundle; performance on deployed hardware remains unmeasured. EmailJS success and failure were mocked; actual delivery and provider abuse controls remain unverified. The app is static with no Next.js image optimizer or repository API; Vercel deployment and firewall settings were not changed. Independent Chrome checks at 1440×900 and 390×844 covered all five category controls, mobile contact navigation, unconfigured contact, a mocked EmailJS HTTP 400 with retained input, and an aborted model request with the page still usable. SwiftShader WebGL2 rendered the scenes. Chrome reported upstream THREE.Clock deprecation and software-GPU warnings. Physical GPU, other browsers, screen readers and real delivery were not tested. No release acceptance is claimed.
+
+
+Project 12 final follow-up: independent Chrome regression checks at 1440×900, 390×844 and 320×568 covered direct hash links, keyboard navigation, every category, a delayed section import and a failed section import. Fixes preserve section anchors and isolate chunk failures, prevent a mobile overlay from intercepting a category and prevent pending sends from erasing newly entered text. Contact and section failure tests were extended. The external HDR preset was removed from the two model stages after observed fetch failures; Stage lighting remains. Real EmailJS delivery, physical GPUs, other browsers and production deployment remain unverified.
+
+Final verification after fixes: Node 26 lint, four tests, production build and audit passed (zero advisories). Independent Chrome SwiftShader checks rendered both locally lit models without HDR requests; the Mac still downloads a Google-hosted Draco decoder. Initial JavaScript remains approximately 1.16 MB minified (318 kB gzip), and the build emits a chunk-size warning.

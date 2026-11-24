@@ -1,3 +1,4 @@
+import VisualBoundary from "./VisualBoundary";
 import { OrbitControls, Stage } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense } from "react";
@@ -24,18 +25,19 @@ const Desc = styled.div`
   }
 `;
 
-/** Web Design tab: Mac 3D model inside Drei Stage (environment lighting). Requires public/mac-draco.glb. */
+/** Web Design tab: Mac 3D model inside Drei Stage (built-in lighting). Requires public/mac-draco.glb. */
 const WebDesign = () => {
   return (
     <>
-      <Canvas>
+      <VisualBoundary><Canvas fallback={<p role="status">3D visual unavailable.</p>}>
+        <ambientLight intensity={0.5} />
         <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.6}>
+          <Stage environment={null} intensity={0.6}>
             <Mac />
           </Stage>
           <OrbitControls enableZoom={false} autoRotate />
         </Suspense>
-      </Canvas>
+      </Canvas></VisualBoundary>
       <Desc>
         We design products with a strong focus on both world class design and
         ensuring your product is a market success.
