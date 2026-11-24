@@ -109,7 +109,7 @@ nav.navbar .navbar-nav a.nav-link.navbar-link:hover,
 nav.navbar .navbar-nav a.nav-link.navbar-link.active {
     opacity: 1;
 }
-span.navbar-text {
+.navbar-text {
     display: flex;
     align-items: center;
 }
@@ -150,7 +150,7 @@ span.navbar-text {
 .social-icon a:hover img {
 	filter: brightness(0) saturate(100%) invert(0%) sepia(7%) saturate(98%) hue-rotate(346deg) brightness(95%) contrast(86%);
 }
-.navbar-text button {
+.navbar-text .vvd {
   font-weight: 700;
   color: #fff;
   border: 1px solid #fff;
@@ -161,10 +161,10 @@ span.navbar-text {
 	background-color: transparent;
 	transition: 0.3s ease-in-out;
 }
-.navbar-text button span {
+.navbar-text .vvd span {
   z-index: 1;
 }
-.navbar-text button::before {
+.navbar-text .vvd::before {
   content: "";
   width: 0%;
   height: 100%;
@@ -175,10 +175,10 @@ span.navbar-text {
   z-index: -1;
   transition: 0.3s ease-in-out;
 }
-.navbar-text button:hover {
+.navbar-text .vvd:hover {
   color: #121212;
 }
-.navbar-text button:hover::before {
+.navbar-text .vvd:hover::before {
 	content: "";
 	width: 100%;
 	height: 100%;
@@ -264,7 +264,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   line-height: 1.5em;
   width: 96%;
 }
-.banner button {
+.banner .connect-link {
   color: #fff;
   font-weight: 700;
   font-size: 20px;
@@ -273,13 +273,13 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   display: flex;
   align-items: center;
 }
-.banner button svg {
+.banner .connect-link svg {
   font-size: 25px;
   margin-left: 10px;
   transition: 0.3s ease-in-out;
   line-height: 1;
 }
-.banner button:hover svg {
+.banner .connect-link:hover svg {
   margin-left: 25px;
 }
 .banner img {
@@ -615,4 +615,26 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   color: #B8B8B8;
   letter-spacing: 0.5px;
   margin-top: 20px;
+}
+
+@media (max-width: 767px) {
+  .banner h1 { font-size: clamp(2.25rem, 10vw, 4.0625rem); }
+  .newsletter-bx { padding: 35px 20px; }
+  .new-email-bx input { min-width: 0; }
+  .new-email-bx button { flex-shrink: 0; padding: 20px; }
+}
+
+input:focus-visible, textarea:focus-visible, select:focus-visible,
+button:focus-visible, a:focus-visible {
+  outline: 2px solid #7c55db;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

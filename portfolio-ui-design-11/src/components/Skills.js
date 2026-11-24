@@ -1,9 +1,12 @@
 import meter1 from "../assets/img/meter1.svg";
 import meter2 from "../assets/img/meter2.svg";
 import meter3 from "../assets/img/meter3.svg";
-import Carousel from "react-multi-carousel";
+import CarouselModule from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import colorSharp from "../assets/img/color-sharp.png";
+
+// Vite's CommonJS interop can expose the component on a nested default export.
+const Carousel = CarouselModule.default ?? CarouselModule;
 
 // Skills section: responsive carousel of skill items (e.g. Web Development, Brand Identity). Breakpoints control how many items show per row.
 export const Skills = () => {
