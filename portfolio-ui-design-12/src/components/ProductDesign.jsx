@@ -1,3 +1,4 @@
+import VisualBoundary from "./VisualBoundary";
 import React, { Suspense } from "react";
 import { OrbitControls, Stage } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -24,18 +25,19 @@ const Desc = styled.div`
   }
 `;
 
-/** Product Design tab: Shoe 3D model (public/shoe.gltf) inside Drei Stage with environment lighting. */
+/** Product Design tab: Shoe 3D model (public/shoe.gltf) inside Drei Stage with built-in lighting. */
 const ProductDesign = () => {
   return (
     <>
-      <Canvas>
+      <VisualBoundary><Canvas fallback={<p role="status">3D visual unavailable.</p>}>
+        <ambientLight intensity={0.5} />
         <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.6}>
+          <Stage environment={null} intensity={0.6}>
             <Shoe />
           </Stage>
           <OrbitControls enableZoom={false} autoRotate />
         </Suspense>
-      </Canvas>
+      </Canvas></VisualBoundary>
       <Desc>
         We design products with a strong focus on both world class design and
         ensuring your product is a market success.

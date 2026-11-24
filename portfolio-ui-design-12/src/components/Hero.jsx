@@ -1,3 +1,4 @@
+import VisualBoundary from "./VisualBoundary";
 import React, { Suspense } from "react";
 import styled from "styled-components";
 import Navbar from "./Navbar";
@@ -21,7 +22,7 @@ const Section = styled.div`
 const Container = styled.div`
   height: 100%;
   scroll-snap-align: center;
-  width: 1400px;
+  width: min(1400px, 100%);
   display: flex;
   justify-content: space-between;
 
@@ -47,7 +48,7 @@ const Left = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 74px;
+  font-size: clamp(42px, 6vw, 74px);
 
   @media only screen and (max-width: 768px) {
     text-align: center;
@@ -126,23 +127,23 @@ const Img = styled.img`
 /** Hero: Navbar, headline, "What We Do" subtitle, description, Learn More button; right side has R3F Canvas (distorted sphere) and a static moon image overlay. Suspense lets 3D load without blocking the rest of the UI. */
 const Hero = () => {
   return (
-    <Section>
+    <Section id="home">
       <Navbar />
       <Container>
         <Left>
           <Title>Think. Make. Solve.</Title>
           <WhatWeDo>
-            <Line src="/img/line.png" />
+            <Line src="/img/line.png" alt="" />
             <Subtitle>What We Do</Subtitle>
           </WhatWeDo>
           <Desc>
             We enjoy creating delightful, human-centered digital experiences.
           </Desc>
-          <Button>Learn More</Button>
+          <Button as="a" href="#studio" style={{ textAlign: "center", textDecoration: "none" }}>Learn More</Button>
         </Left>
         <Right>
           {/* React Three Fiber Canvas: OrbitControls (no zoom), lights, and a Sphere with MeshDistortMaterial for the animated blob. */}
-          <Canvas>
+          <VisualBoundary><Canvas fallback={<p role="status">3D visual unavailable.</p>}>
             <Suspense fallback={null}>
               <OrbitControls enableZoom={false} />
               <ambientLight intensity={1} />
@@ -156,8 +157,8 @@ const Hero = () => {
                 />
               </Sphere>
             </Suspense>
-          </Canvas>
-          <Img src="/img/moon.png" />
+          </Canvas></VisualBoundary>
+          <Img src="/img/moon.png" alt="" />
         </Right>
       </Container>
     </Section>

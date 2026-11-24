@@ -74,31 +74,33 @@ const Right = styled.div`
   }
 `;
 
-/** Contact form (name, email, message) sent via EmailJS. Replace service_id, template_id, and public_key with your EmailJS values (or use env vars). ref attaches to the form for sendForm. */
+/** Contact form (name, email, message) sent via EmailJS. Configure the public EmailJS identifiers using Vite environment variables. ref attaches to the form for sendForm. */
 const Contact = () => {
   const ref = useRef();
-  const [success, setSuccess] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const sending = useRef(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    /* EmailJS sends the form from the client; no backend required. Use VITE_* env vars in production. */
-    emailjs
-      .sendForm(
-        "service_id",
-        "template_id",
-        ref.current,
-        "public_key"
-      )
-      .then(
-        (result) => {
-          console.log(result.text);
-          setSuccess(true);
-        },
-        (error) => {
-          console.log(error.text);
-          setSuccess(false);
-        }
-      );
+    if (sending.current) return;
+    const service = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const template = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    if (!service || !template || !publicKey) {
+      setStatus("unconfigured");
+      return;
+    }
+    sending.current = true;
+    setStatus("sending");
+    try {
+      await emailjs.sendForm(service, template, ref.current, { publicKey });
+      ref.current.reset();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    } finally {
+      sending.current = false;
+    }
   };
   return (
     <Section>
@@ -106,16 +108,22 @@ const Contact = () => {
         <Left>
           <Form ref={ref} onSubmit={handleSubmit}>
             <Title>Contact Us</Title>
-            <Input placeholder="Name" name="name" />
-            <Input placeholder="Email" name="email" />
+            <Input placeholder="Name" aria-label="Name" name="name" required disabled={status === "sending"} />
+            <Input placeholder="Email" aria-label="Email" name="email" type="email" required disabled={status === "sending"} />
             <TextArea
               placeholder="Write your message"
+              aria-label="Message"
+              required
               name="message"
+              disabled={status === "sending"}
               rows={10}
             />
-            <Button type="submit">Send</Button>
-            {success &&
-              "Your message has been sent. We'll get back to you soon :)"}
+            <Button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Send"}</Button>
+            <div role="status" aria-live="polite">
+              {status === "success" && "Your message has been sent. We'll get back to you soon :)"}
+              {status === "error" && "Your message could not be sent. Please try again."}
+              {status === "unconfigured" && "The contact form is not configured yet."}
+            </div>
           </Form>
         </Left>
         <Right>

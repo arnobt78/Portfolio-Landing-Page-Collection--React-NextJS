@@ -12,7 +12,7 @@ const Section = styled.div`
 `;
 
 const Container = styled.div`
-  width: 1400px;
+  width: min(1400px, 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -45,7 +45,8 @@ const List = styled.ul`
 `;
 
 const ListItem = styled.li`
-  cursor: pointer;
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible { outline: 2px solid #da4ea2; outline-offset: 4px; }
 `;
 
 const Icons = styled.div`
@@ -69,24 +70,24 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-/** Top navigation: logo, nav items (Home, Studio, Works, Contact), search icon, and "Hire Now" button. Links are non-functional by default; wire to scroll or router as needed. */
+/** Top navigation: logo, nav items (Home, Studio, Works, Contact), search icon, and "Hire Now" button. Navigation links target the page sections. */
 const Navbar = () => {
   return (
     <Section>
       <Container>
         <Links>
-          <Logo src="/img/logo.png" />
+          <Logo src="/img/logo.png" alt="Portfolio logo" />
           <List>
-            <ListItem>Home</ListItem>
-            <ListItem>Studio</ListItem>
-            <ListItem>Works</ListItem>
-            <ListItem>Contact</ListItem>
+            <ListItem><a href="#home">Home</a></ListItem>
+            <ListItem><a href="#studio">Studio</a></ListItem>
+            <ListItem><a href="#works">Works</a></ListItem>
+            <ListItem><a href="#contact">Contact</a></ListItem>
           </List>
         </Links>
         <Icons>
           {/* Changed the image due to copyright problems */}
-          <Icon src="/img/search.png" />
-          <Button>Hire Now</Button>
+          <Icon src="/img/search.png" alt="" aria-hidden="true" />
+          <Button as="a" href="#contact" style={{ textAlign: "center", textDecoration: "none" }}>Hire Now</Button>
         </Icons>
       </Container>
     </Section>

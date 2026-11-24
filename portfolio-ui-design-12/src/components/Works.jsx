@@ -25,7 +25,7 @@ const Section = styled.div`
 `;
 
 const Container = styled.div`
-  width: 1400px;
+  width: min(1400px, 100%);
   display: flex;
   justify-content: space-between;
 
@@ -41,6 +41,7 @@ const Left = styled.div`
   align-items: center;
 
   @media only screen and (max-width: 768px) {
+    flex: 0 0 auto;
     padding: 20px;
     justify-content: center;
   }
@@ -53,7 +54,14 @@ const List = styled.ul`
   gap: 20px;
 `;
 
-const ListItem = styled.li`
+const ListItem = styled.button`
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  &:focus-visible { outline: 2px solid #da4ea2; outline-offset: 4px; }
   font-size: 90px;
   font-weight: bold;
   cursor: pointer;
@@ -69,7 +77,7 @@ const ListItem = styled.li`
 
   /* Pseudo-element shows the same text in pink; width animates on hover for a fill effect. */
   ::after {
-    content: "${(props) => props.text}";
+    content: "${(props) => props.$text}";
     position: absolute;
     top: 0;
     left: 0;
@@ -94,6 +102,8 @@ const ListItem = styled.li`
 
 const Right = styled.div`
   flex: 1;
+  position: relative;
+  min-height: 0;
 `;
 
 /** Works section: left = list of categories (hover fill effect); right = 3D view (WebDesign = Mac, Development = Atom, else ProductDesign = Shoe). */
@@ -105,9 +115,9 @@ const Works = () => {
         <Left>
           <List>
             {data.map((item) => (
-              <ListItem key={item} text={item} onClick={() => setWork(item)}>
+              <li key={item}><ListItem type="button" $text={item} aria-pressed={work === item} onClick={() => setWork(item)}>
                 {item}
-              </ListItem>
+              </ListItem></li>
             ))}
           </List>
         </Left>
