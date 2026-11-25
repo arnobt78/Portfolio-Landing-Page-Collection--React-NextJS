@@ -24,9 +24,15 @@ export default function IntroAnimation({ onFinish }) {
   /* When index is before the last greeting: animate current text in, then advance index. */
   useEffect(() => {
     let greetingTimer;
+    let animation;
+    let timeline;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      greetingTimer = setTimeout(onFinish, 0);
+      return () => { clearTimeout(greetingTimer); animation?.kill(); timeline?.kill(); };
+    }
 
     if (index < greetings.length - 1) {
-      gsap.fromTo(
+      animation = gsap.fromTo(
         greetingRef.current,
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.12 }
@@ -34,18 +40,18 @@ export default function IntroAnimation({ onFinish }) {
       greetingTimer = setTimeout(() => setIndex(i => i + 1), 180);
     } else {
       /* Last greeting: show it, then after 300ms run exit timeline (slide up + morph path). */
-      gsap.fromTo(
+      animation = gsap.fromTo(
         greetingRef.current,
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.12 }
       );
 
       greetingTimer = setTimeout(() => {
-        const tl = gsap.timeline({
+        timeline = gsap.timeline({
           onComplete: () => onFinish && onFinish(),
         });
 
-        tl.to([overlayRef.current, greetingRef.current], {
+        timeline.to([overlayRef.current, greetingRef.current], {
           duration: 1.8,
           y: "-100vh",
           ease: "power4.inOut",
@@ -61,7 +67,7 @@ export default function IntroAnimation({ onFinish }) {
       }, 300);
     }
 
-    return () => clearTimeout(greetingTimer);
+    return () => { clearTimeout(greetingTimer); animation?.kill(); timeline?.kill(); };
   }, [index, onFinish, greetings.length]);
 
   return (

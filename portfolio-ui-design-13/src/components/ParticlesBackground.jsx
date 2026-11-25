@@ -10,6 +10,7 @@ export default function ParticleBackground() { // Define a React component
   useEffect(() => { // Run effect after component mounts
     const canvas = canvasRef.current; // Get the actual canvas DOM element
     const ctx = canvas.getContext("2d"); // Get 2D drawing context for the canvas
+    if (!ctx) return;
 
     let particles = []; // Array to store all particles
     const particleCount = 50; // Total number of particles
@@ -67,19 +68,40 @@ export default function ParticleBackground() { // Define a React component
     handleResize(); // Initialize canvas size and particles on mount
     window.addEventListener("resize", handleResize); // Update when window is resized
 
-    // 🎞️ Animation loop → makes particles move forever
-    let animationId; // Store animation frame ID so we can cancel it later
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear entire canvas each frame
-      particles.forEach((p) => p.update()); // Update & draw every particle
-      animationId = requestAnimationFrame(animate); // Schedule next frame (60fps)
+    // Animate only while visible and allowed by the user's motion preference.
+    let animationId = null;
+    let visible = false;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((particle) => particle.update());
     }
-    animate(); // Start animation loop
+    function animate() {
+      draw();
+      animationId = requestAnimationFrame(animate);
+    }
+    function updateAnimation() {
+      if (animationId !== null) cancelAnimationFrame(animationId);
+      animationId = null;
+      if (visible && !document.hidden && !reducedMotion.matches) animate();
+      else if (visible) draw();
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      updateAnimation();
+    });
+    observer.observe(canvas);
+    window.addEventListener("resize", updateAnimation);
+    document.addEventListener("visibilitychange", updateAnimation);
+    reducedMotion.addEventListener("change", updateAnimation);
 
-    // 🧹 Cleanup on component unmount
     return () => {
-      cancelAnimationFrame(animationId); // Stop animation loop
-      window.removeEventListener("resize", handleResize); // Remove resize listener
+      if (animationId !== null) cancelAnimationFrame(animationId);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateAnimation);
+      reducedMotion.removeEventListener("change", updateAnimation);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", updateAnimation);
     };
   }, []); // [] → run this effect only once when component mounts
 

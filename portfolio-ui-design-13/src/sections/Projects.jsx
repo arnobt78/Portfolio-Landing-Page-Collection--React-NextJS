@@ -29,14 +29,12 @@ const useIsMobile = (query = "(max-width: 639px)") => {
     if (typeof window === "undefined") return;
     const mql = window.matchMedia(query); // Media query list
     const handler = (e) => setIsMobile(e.matches); // Update state when query changes
-    mql.addEventListener?.("change", handler) || mql.addListener(handler);
-    // Add correct event listener (modern OR fallback)
-
-    setIsMobile(mql.matches); // Initialize with current screen size
-    return () =>
-      mql.removeEventListener?.("change", handler) ||
-      mql.removeListener(handler);
-    // Cleanup event listener
+    if (mql.addEventListener) mql.addEventListener("change", handler);
+    else mql.addListener(handler);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", handler);
+      else mql.removeListener(handler);
+    };
   }, [query]);
 
   return isMobile;

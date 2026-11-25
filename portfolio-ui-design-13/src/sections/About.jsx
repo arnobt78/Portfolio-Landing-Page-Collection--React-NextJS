@@ -40,7 +40,7 @@ export default function About() {
 
             <div className="absolute inset-0 " />
 
-            <img src={p} alt="test" />
+            <img src={p} alt="" loading="lazy" />
           </motion.div>
 
           {/* Name + Role + Bio + CTAs */}

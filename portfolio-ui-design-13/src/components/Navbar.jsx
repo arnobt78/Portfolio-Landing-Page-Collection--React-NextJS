@@ -3,15 +3,17 @@
  * Visibility: when #home is in view we force the navbar visible; otherwise hide on scroll down,
  * show on scroll up, and auto-hide again after 3s of no scrolling.
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import OverlayMenu from "./OverlayMenu";
 import { FiMenu } from "react-icons/fi";
 import Logo from "../assets/Logo.png"; // Adjust path
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
   const [visible, setVisible] = useState(true);
   const [forceVisible, setForceVisible] = useState(false);
+  const navRef = useRef(null);
   const lastScrollY = useRef(0);
   const timerId = useRef(null);
 
@@ -42,7 +44,7 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       // If on homepage, never hide navbar
-      if (forceVisible) {
+      if (forceVisible || navRef.current?.contains(document.activeElement)) {
         setVisible(true);
         return;
       }
@@ -59,7 +61,7 @@ export default function Navbar() {
         // hide again after 3sec idle
         if (timerId.current) clearTimeout(timerId.current);
         timerId.current = setTimeout(() => {
-          setVisible(false);
+          if (!navRef.current?.contains(document.activeElement)) setVisible(false);
         }, 3000);
       }
 
@@ -76,6 +78,8 @@ export default function Navbar() {
   return (
     <>
       <nav
+        ref={navRef}
+        onFocusCapture={() => setVisible(true)}
         className={`fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-50 transition-transform duration-300 ${
           visible ? "translate-y-0" : "-translate-y-full"
         }`}
@@ -94,6 +98,8 @@ export default function Navbar() {
             onClick={() => setMenuOpen(true)}
             className="text-white text-3xl focus:outline-none"
             aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="portfolio-menu"
           >
             <FiMenu />
           </button>
@@ -110,7 +116,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <OverlayMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <OverlayMenu isOpen={menuOpen} onClose={closeMenu} />
     </>
   );
 }
