@@ -5,7 +5,7 @@
 import {FaJava , FaReact} from 'react-icons/fa';
 import {SiNextdotjs, SiTypescript, SiTailwindcss, SiFastapi, SiPython, SiDocker, SiMongodb, SiAngular} from 'react-icons/si';
 import {DiNodejsSmall} from 'react-icons/di';
-import { motion, useMotionValue, useReducedMotion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 
@@ -29,12 +29,22 @@ const skills = [
 const repeated = [...skills , ...skills]
 
 const [dir , setDir] = useState(-1);   /* scroll direction: 1 or -1 */
-const reducedMotion = useReducedMotion();
+const [reducedMotion, setReducedMotion] = useState(() =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+);
 const [active , setActive] = useState(false); /* true when section is in view (carousel runs) */
 const sectionRef = useRef(null);
 const trackRef = useRef(null);  /* used to read track width for loop wrap */
 const touchY = useRef(null);
 const x= useMotionValue(0);    /* horizontal offset of the track; style={{ x }} on motion.div */
+
+// Keep the layout in sync if the user changes their motion preference while browsing.
+useEffect(() => {
+  const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const onChange = (event) => setReducedMotion(event.matches);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}, []);
 
 /* IntersectionObserver: set active when section is at least 10% visible so carousel only runs when seen. */
 useEffect(()=> {
@@ -77,7 +87,8 @@ useEffect(()=> {
 
 /* Animation loop: move track by SPEED * dir per second; wrap position when it exceeds half track width for seamless loop. */
 useEffect(()=> {
-  if (!active || reducedMotion) return;
+  if (reducedMotion) { x.set(0); return; }
+  if (!active) return;
   let id;
   let last = performance.now();
   const SPEED = 80;
@@ -133,11 +144,11 @@ Modern Applications | Modern Technologies
 <div  className='relative w-full overflow-hidden'>
 <motion.div 
 ref={trackRef}
-className='flex gap-10 text-6xl text-[#1cd8d2]'
-style={{x, whiteSpace: "nowrap" , willChange: "transform"}}
+className={`flex gap-10 text-6xl text-[#1cd8d2] ${reducedMotion ? "flex-wrap justify-center" : ""}`}
+style={{ x: reducedMotion ? 0 : x, whiteSpace: reducedMotion ? "normal" : "nowrap", willChange: reducedMotion ? "auto" : "transform" }}
 >
 
-{repeated.map((s,i) => (
+{(reducedMotion ? skills : repeated).map((s,i) => (
   <div 
   key={i} className='flex flex-col items-center gap-2 min-w-[120px]'
   aria-label = {s.name}

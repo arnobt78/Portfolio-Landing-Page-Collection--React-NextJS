@@ -9,6 +9,7 @@ export default function MusicPlayer() {
   const wantedPlaying = useRef(false);
   const attempt = useRef(0);
   const switchingTrack = useRef(false);
+  const playbackFailed = useRef(false);
   const clickTimer = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [message, setMessage] = useState("Wanna play music while scrolling?");
@@ -17,6 +18,12 @@ export default function MusicPlayer() {
   const play = () => {
     const audio = audioRef.current;
     if (!audio) return;
+    // A failed media resource must be reloaded, while normal resume keeps its position.
+    if (audio.error) {
+      switchingTrack.current = true;
+      audio.load();
+    }
+    playbackFailed.current = false;
     wantedPlaying.current = true;
     const current = ++attempt.current;
     const result = audio.play();
@@ -24,6 +31,7 @@ export default function MusicPlayer() {
       if (current === attempt.current) {
         wantedPlaying.current = false;
         switchingTrack.current = false;
+        playbackFailed.current = true;
         setIsPlaying(false);
         setMessage("Music could not be played. Try again.");
       }
@@ -101,7 +109,7 @@ export default function MusicPlayer() {
         onPause={() => {
           const audio = audioRef.current;
           // A source switch may dispatch a pause while its replacement is starting.
-          if (!audio || !audio.paused || audio.ended || switchingTrack.current) return;
+          if (!audio || !audio.paused || audio.ended || switchingTrack.current || playbackFailed.current) return;
           wantedPlaying.current = false;
           attempt.current += 1;
           setIsPlaying(false);
@@ -110,7 +118,9 @@ export default function MusicPlayer() {
         onError={() => {
           wantedPlaying.current = false;
           switchingTrack.current = false;
+          playbackFailed.current = true;
           attempt.current += 1;
+          audioRef.current?.pause();
           setIsPlaying(false);
           setMessage("Music could not be played. Try again.");
         }}

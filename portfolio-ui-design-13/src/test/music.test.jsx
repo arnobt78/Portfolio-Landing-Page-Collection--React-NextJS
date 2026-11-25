@@ -42,6 +42,21 @@ describe("music player", () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(250); });
     expect(play).toHaveBeenCalledTimes(2);
   });
+  it("stops failed media, preserves the error, and reloads on retry", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
+    const load = vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {});
+    const { container } = render(<MusicPlayer />);
+    const audio = container.querySelector("audio");
+    Object.defineProperty(audio, "error", { value: { code: 4 }, configurable: true });
+    fireEvent.error(audio);
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
+    fireEvent.pause(audio);
+    expect(screen.getByRole("status").textContent).toContain("could not be played");
+    fireEvent.click(screen.getByRole("button", { name: "Play music" }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(250); });
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(play).toHaveBeenCalledTimes(1);
+  });
   it("shuffles once on a double click without starting paused audio", () => {
     const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
     vi.spyOn(Math, "random").mockReturnValue(0.4);
