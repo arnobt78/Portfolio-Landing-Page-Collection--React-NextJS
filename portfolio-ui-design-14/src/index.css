@@ -122,3 +122,14 @@ body {
     font-size: 40px;
   }
 }
+
+/* Keep the first role readable when entrance animation is skipped. */
+.portfolio-no-intro .landing-h2-2, .portfolio-no-intro .landing-h2-info-1 { display: none; }
+/* Sections normally revealed by the character timeline must remain available without it. */
+.portfolio-no-intro .what-box-in { display: flex !important; }
+.portfolio-no-intro .career-timeline { max-height: 100% !important; }
+@media (prefers-reduced-motion: reduce) {
+  .main-active { opacity: 1; animation: none; }
+  .what-box-in { display: flex !important; }
+  .career-timeline { max-height: 100% !important; }
+}

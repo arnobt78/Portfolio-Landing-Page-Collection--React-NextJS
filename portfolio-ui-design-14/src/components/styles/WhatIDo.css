@@ -50,14 +50,14 @@
   box-sizing: border-box;
 }
 
-.what-noTouch:hover,
+.what-box-in:not(.what-has-active) .what-noTouch:hover,
 .what-content-active {
   min-height: 67%;
   padding: 40px 50px;
 }
 
-.what-noTouch:hover ~ .what-content,
-.what-box-in:hover .what-noTouch:not(:hover),
+.what-box-in:not(.what-has-active) .what-noTouch:hover ~ .what-content,
+.what-box-in:not(.what-has-active):hover .what-noTouch:not(:hover),
 .what-content.what-sibling {
   min-height: 33%;
   padding: 10px 50px;
@@ -261,13 +261,13 @@
   .what-content p {
     font-size: 13px;
   }
-  .what-noTouch:hover,
+  .what-box-in:not(.what-has-active) .what-noTouch:hover,
   .what-content-active {
     padding: 20px 30px;
   }
 
-  .what-noTouch:hover ~ .what-content,
-  .what-box-in:hover .what-noTouch:not(:hover),
+  .what-box-in:not(.what-has-active) .what-noTouch:hover ~ .what-content,
+  .what-box-in:not(.what-has-active):hover .what-noTouch:not(:hover),
   .what-content.what-sibling {
     padding: 10px 30px;
   }
@@ -300,14 +300,14 @@
   .what-content p {
     font-size: 14px;
   }
-  .what-noTouch:hover,
+  .what-box-in:not(.what-has-active) .what-noTouch:hover,
   .what-content-active {
     min-height: 67%;
     padding: 50px;
   }
 
-  .what-noTouch:hover ~ .what-content,
-  .what-box-in:hover .what-noTouch:not(:hover),
+  .what-box-in:not(.what-has-active) .what-noTouch:hover ~ .what-content,
+  .what-box-in:not(.what-has-active):hover .what-noTouch:not(:hover),
   .what-content.what-sibling {
     min-height: 33%;
     padding: 10px 50px;
@@ -357,7 +357,7 @@
   .what-content p {
     font-size: 11px;
   }
-  .what-noTouch:hover,
+  .what-box-in:not(.what-has-active) .what-noTouch:hover,
   .what-content-active {
     padding: 10px 30px;
   }
@@ -365,8 +365,8 @@
     font-size: 11px;
   }
 
-  .what-noTouch:hover ~ .what-content,
-  .what-box-in:hover .what-noTouch:not(:hover),
+  .what-box-in:not(.what-has-active) .what-noTouch:hover ~ .what-content,
+  .what-box-in:not(.what-has-active):hover .what-noTouch:not(:hover),
   .what-content.what-sibling {
     padding: 5px 30px;
   }
@@ -390,4 +390,9 @@
     font-size: 7rem;
     line-height: 6.8rem;
   }
+}
+
+.what-content:focus-visible {
+  outline: 2px solid var(--accentColor);
+  outline-offset: 4px;
 }

@@ -9,6 +9,7 @@ import { eyebrowBoneNames, typingBoneNames } from "../../../data/boneData";
 const setAnimations = (gltf: GLTF) => {
   const character = gltf.scene;
   const mixer = new THREE.AnimationMixer(character);
+  let blinkTimer: ReturnType<typeof setTimeout> | undefined;
   if (gltf.animations) {
     const introClip = gltf.animations.find(
       (clip) => clip.name === "introAnimation"
@@ -44,9 +45,10 @@ const setAnimations = (gltf: GLTF) => {
     const introAction = mixer.clipAction(introClip!);
     introAction.clampWhenFinished = true;
     introAction.reset().play();
-    setTimeout(() => {
+    clearTimeout(blinkTimer);
+    blinkTimer = setTimeout(() => {
       const blink = gltf.animations.find((clip) => clip.name === "Blink");
-      mixer.clipAction(blink!).play().fadeIn(0.5);
+      if (blink) mixer.clipAction(blink).play().fadeIn(0.5);
     }, 2500);
   }
   /** Eyebrow raise on hover over hoverDiv; returns cleanup to remove listeners */
@@ -86,7 +88,12 @@ const setAnimations = (gltf: GLTF) => {
       hoverDiv.removeEventListener("mouseleave", onLeaveFace);
     };
   }
-  return { mixer, startIntro, hover };
+  const dispose = () => {
+    clearTimeout(blinkTimer);
+    mixer.stopAllAction();
+    mixer.uncacheRoot(character);
+  };
+  return { mixer, startIntro, hover, dispose };
 };
 
 /** Create an animation action filtered to specific bone tracks (e.g. typing, eyebrow) */

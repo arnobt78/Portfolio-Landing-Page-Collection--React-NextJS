@@ -361,3 +361,7 @@
     font-size: 18px;
   }
 }
+
+/* Make the portfolio available while the optional 3D asset is loading. */
+.loading-continue { position: absolute; z-index: 20; bottom: 2rem; color: #fff; background: #19121e; border: 1px solid #fff; border-radius: 2rem; padding: .75rem 1.25rem; cursor: pointer; }
+.loading-continue:focus-visible { outline: 3px solid #7844ad; outline-offset: 3px; }

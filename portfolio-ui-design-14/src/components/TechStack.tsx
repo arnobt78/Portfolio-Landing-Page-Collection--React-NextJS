@@ -27,6 +27,7 @@ const imageUrls = [
   "/images/typescript.webp",
   "/images/javascript.webp",
 ];
+const imageLabels = ["React", "Next.js", "Node.js", "Express", "MongoDB", "MySQL", "TypeScript", "JavaScript"];
 const textures = imageUrls.map((url) => textureLoader.load(url));
 
 const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
@@ -56,8 +57,9 @@ function SphereGeo({
   useFrame((_state, delta) => {
     if (!isActive) return;
     delta = Math.min(0.1, delta);
+    if (!api.current) return;
     const impulse = vec
-      .copy(api.current!.translation())
+      .copy(api.current.translation())
       .normalize()
       .multiply(
         new THREE.Vector3(
@@ -133,31 +135,29 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
 
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+
+  // Switching the operating-system preference also switches the visual mode.
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    preference.addEventListener("change", onChange);
+    return () => preference.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     /** Enable physics interaction only after user has scrolled past #work */
     const handleScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
+      const threshold = document.getElementById("work")?.getBoundingClientRect().top ?? Infinity;
       setIsActive(scrollY > threshold);
     };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    // Scroll fires during both manual and smooth navigation; no polling is needed.
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   const materials = useMemo(() => {
     return textures.map(
@@ -173,12 +173,19 @@ const TechStack = () => {
         })
     );
   }, []);
+  useEffect(() => () => materials.forEach((material) => material.dispose()), [materials]);
 
   return (
     <div className="techstack">
       <h2> My Techstack</h2>
 
-      <Canvas
+      {reducedMotion ? (
+        <div aria-label="Technology stack" style={{ position: "absolute", top: "45%", left: "50%", transform: "translate(-50%, -10%)", width: "min(700px, 90%)", display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", justifyItems: "center", gap: "24px" }}>
+          {imageUrls.map((url, index) => (
+            <img key={url} src={url} alt={imageLabels[index]} style={{ width: "min(70px, 100%)", height: "70px", objectFit: "contain" }} />
+          ))}
+        </div>
+      ) : <Canvas
         shadows
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
@@ -201,7 +208,7 @@ const TechStack = () => {
             <SphereGeo
               key={i}
               {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
+              material={materials[i % materials.length]}
               isActive={isActive}
             />
           ))}
@@ -214,7 +221,7 @@ const TechStack = () => {
         <EffectComposer enableNormalPass={false}>
           <N8AO color="#0f002c" aoRadius={2} intensity={1.15} />
         </EffectComposer>
-      </Canvas>
+      </Canvas>}
     </div>
   );
 };

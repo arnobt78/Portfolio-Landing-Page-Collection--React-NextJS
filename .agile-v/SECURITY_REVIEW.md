@@ -53,3 +53,8 @@ Project 12: npm audit reports zero advisories after its upgrade. EmailJS identif
 
 
 Project 13: npm audit reports zero advisories after modernization. EmailJS VITE identifiers are browser-visible and must not contain secrets; allowed origins and provider usage controls require separate configuration and were not verified. Contact submissions were mocked and production settings were not changed. The project contains no application API or Next.js image optimizer.
+
+
+Project 14: Node 26 npm audit reports zero advisories after dependency updates. The application is a static frontend with no repository API or Next.js image optimizer. Model, encrypted asset, local decoder and LFS pointer were preserved; the client-side model decryption mechanism does not constitute secret protection. Deployment settings and external assets were not verified.
+
+Project 14 independent security review identified no new backend or server-side credential surface. Post-load graphics failure and motion-preference handling were corrected and retested; browser-side model decryption remains an obfuscation mechanism, not confidentiality.

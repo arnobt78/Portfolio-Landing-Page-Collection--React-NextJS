@@ -1,7 +1,4 @@
-/**
- * Header: logo, email link, nav (About, Work, Contact). On desktop, # links
- * are intercepted and smooth-scroll to sections. smoother is a no-op used by initialFX.
- */
+/** Header links use native section anchors; the initial hash is restored after mount. */
 import { useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HoverLinks from "./HoverLinks";
@@ -27,28 +24,17 @@ export const smoother = {
 
 const Navbar = () => {
   useEffect(() => {
-    window.scrollTo(0, 0);
-
-    const links = document.querySelectorAll(".header ul a");
-    links.forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", (e) => {
-        if (window.innerWidth > 1024) {
-          const href = element.getAttribute("data-href");
-          if (href?.startsWith("#")) {
-            e.preventDefault();
-            const section = document.querySelector(href);
-            if (section instanceof HTMLElement) {
-              section.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-          }
-        }
-      });
+    // The page mounts after the browser's initial hash lookup.
+    const id = window.location.hash.slice(1);
+    const frame = requestAnimationFrame(() => {
+      if (["about", "work", "contact"].includes(id)) {
+        document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+      }
     });
 
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("resize", onResize); };
   }, []);
 
   return (
