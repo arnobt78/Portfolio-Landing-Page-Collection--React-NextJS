@@ -14,7 +14,8 @@ const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
   const hoverDivRef = useRef<HTMLDivElement>(null);
   const [unavailable, setUnavailable] = useState(false);
-  const { setLoading, finishLoading } = useLoading();
+  const { setLoading, finishLoading, isFallback, fallbackActive } = useLoading();
+  const onFallback = useRef<() => void>(() => {});
 
   useEffect(() => {
     const canvasEl = canvasDiv.current;
@@ -51,7 +52,10 @@ const Scene = () => {
     const clock = new THREE.Clock();
     let active = true;
     let failed = false;
+    let progressReady = false;
+    let introStarted = false;
     let frame = 0;
+    let shutdown = () => {};
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
     let introTimer: ReturnType<typeof setTimeout> | undefined;
     let touchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -85,15 +89,7 @@ const Scene = () => {
     const failScene = () => {
       if (!active || failed) return;
       failed = true;
-      cancelAnimationFrame(frame);
-      abort.abort();
-      clearTimeout(resizeTimer);
-      clearTimeout(introTimer);
-      clearTimeout(touchTimer);
-      cancelTouchReset?.();
-      progress.cancel();
-      releaseModel();
-      light.dispose();
+      shutdown();
       setUnavailable(true);
       finishLoading();
     };
@@ -101,7 +97,7 @@ const Scene = () => {
       if (!model) return;
       clearTimelines?.();
       clearTimelines = undefined;
-      if (motionPreference.matches) return;
+      if (motionPreference.matches || isFallback()) return;
       const clearCharacter = setCharTimeline(model, camera);
       try {
         const clearCareer = setAllTimeline();
@@ -150,7 +146,7 @@ const Scene = () => {
     const animate = () => {
       if (!active || failed) return;
       frame = 0;
-      if (!motionPreference.matches) {
+      if (!motionPreference.matches && !isFallback()) {
         frame = requestAnimationFrame(animate);
         if (headBone) {
           handleHeadRotation(headBone, mouse.x, mouse.y, interpolation.x, interpolation.y, THREE.MathUtils.lerp);
@@ -161,10 +157,39 @@ const Scene = () => {
       try { renderer.render(scene, camera); } catch { failScene(); }
     };
     // Render on asset or layout changes, without a continuous animation loop.
-    renderStatic = () => { if (motionPreference.matches) animate(); };
+    renderStatic = () => { if (motionPreference.matches || isFallback()) animate(); };
+    // One startup path owns the intro; media preference changes never replay it.
+    const scheduleIntro = () => {
+      if (!active || failed || !model || !progressReady || introStarted || introTimer || motionPreference.matches || isFallback()) return;
+      introTimer = setTimeout(() => {
+        introTimer = undefined;
+        if (!active || failed || motionPreference.matches || isFallback() || introStarted) return;
+        introStarted = true;
+        light.turnOnLights();
+        animations?.startIntro();
+      }, 2500);
+    };
+    onFallback.current = () => {
+      if (!active || failed || !isFallback()) return;
+      clearTimeout(introTimer);
+      introTimer = undefined;
+      cancelAnimationFrame(frame);
+      frame = 0;
+      progress.cancel();
+      clearTimelines?.();
+      clearTimelines = undefined;
+      removeHover?.();
+      removeHover = undefined;
+      animations?.dispose();
+      animations = undefined;
+      if (model) light.turnOnLights(true);
+      renderStatic();
+    };
     const onMotionChange = () => {
       if (!active || failed) return;
       clearTimeout(introTimer);
+      introTimer = undefined;
+      if (isFallback()) { onFallback.current(); return; }
       if (motionPreference.matches) {
         cancelAnimationFrame(frame);
         frame = 0;
@@ -176,8 +201,8 @@ const Scene = () => {
         try {
           if (model) {
             refreshTimelines();
-            light.turnOnLights();
-            animations?.startIntro();
+            if (introStarted) light.turnOnLights();
+            else scheduleIntro();
           }
           clock.getDelta();
           if (!frame) animate();
@@ -185,32 +210,10 @@ const Scene = () => {
       }
     };
     motionPreference.addEventListener("change", onMotionChange);
-    animate();
 
-    loadCharacter(abort.signal).then((gltf) => {
-      if (!active || abort.signal.aborted) { disposeCharacter(gltf.scene); return; }
-      model = gltf.scene;
-      animations = setAnimations(gltf);
-      if (hoverDivRef.current) removeHover = animations.hover(gltf, hoverDivRef.current);
-      scene.add(model);
-      headBone = model.getObjectByName("spine006") || null;
-      screenLight = model.getObjectByName("screenlight") || null;
-      refreshTimelines();
-      if (motionPreference.matches) {
-        light.turnOnLights(true);
-        renderStatic();
-      }
-      void progress.loaded().then(() => {
-        if (!active || failed || motionPreference.matches) return;
-        introTimer = setTimeout(() => {
-          if (!active || failed || motionPreference.matches) return;
-          light.turnOnLights();
-          animations?.startIntro();
-        }, 2500);
-      });
-    }).catch(failScene);
-
-    return () => {
+    // Failure and unmount share one idempotent shutdown, including listeners and GPU resources.
+    shutdown = () => {
+      if (!active) return;
       active = false;
       abort.abort();
       cancelAnimationFrame(frame);
@@ -233,7 +236,40 @@ const Scene = () => {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [finishLoading, setLoading]);
+    animate();
+
+    loadCharacter(abort.signal).then((gltf) => {
+      if (!active || abort.signal.aborted) { disposeCharacter(gltf.scene); return; }
+      model = gltf.scene;
+      if (!isFallback()) {
+        animations = setAnimations(gltf);
+        if (hoverDivRef.current) removeHover = animations.hover(gltf, hoverDivRef.current);
+      }
+      scene.add(model);
+      headBone = model.getObjectByName("spine006") || null;
+      screenLight = model.getObjectByName("screenlight") || null;
+      refreshTimelines();
+      if (motionPreference.matches || isFallback()) {
+        light.turnOnLights(true);
+        renderStatic();
+      }
+      if (isFallback()) { progress.cancel(); return; }
+      void progress.loaded().then(() => {
+        if (!active || failed) return;
+        progressReady = true;
+        scheduleIntro();
+      });
+    }).catch(failScene);
+
+    return () => {
+      onFallback.current = () => {};
+      shutdown();
+    };
+  }, [finishLoading, isFallback, setLoading]);
+
+  useEffect(() => {
+    if (isFallback()) onFallback.current();
+  }, [isFallback, fallbackActive]);
 
   return (
     <div className="character-container">

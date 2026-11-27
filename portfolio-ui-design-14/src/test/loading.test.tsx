@@ -8,8 +8,8 @@ import { setProgress } from "../components/Loading";
 vi.mock("react-fast-marquee", () => ({ default: ({ children }: { children: ReactNode }) => <div>{children}</div> }));
 
 const Content = () => {
-  const { finishLoading, setLoading } = useLoading();
-  return <><h1>Portfolio content</h1><button onClick={() => { finishLoading(); finishLoading(); }}>Complete twice</button><button onClick={() => setLoading(100)}>Asset ready</button><button onClick={() => finishLoading("ready")}>Ready now</button></>;
+  const { finishLoading, setLoading, isFallback } = useLoading();
+  return <><output data-testid="fallback-state">{String(isFallback())}</output><h1>Portfolio content</h1><button onClick={() => { finishLoading(); finishLoading(); }}>Complete twice</button><button onClick={() => setLoading(100)}>Asset ready</button><button onClick={() => finishLoading("ready")}>Ready now</button></>;
 };
 
 beforeEach(() => {
@@ -83,6 +83,15 @@ describe("portfolio loading", () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(2500); });
     expect(document.body.classList.contains("portfolio-no-intro")).toBe(true);
     expect(document.querySelector("main")?.classList.contains("main-active")).toBe(false);
+  });
+
+  it("distinguishes reduced motion from actual model fallback", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    render(<LoadingProvider><Content /></LoadingProvider>);
+    fireEvent.click(screen.getByRole("button", { name: "Ready now" }));
+    expect(screen.getByTestId("fallback-state").textContent).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Complete twice" }));
+    expect(screen.getByTestId("fallback-state").textContent).toBe("true");
   });
 
   it("stops progress callbacks when the scene is disposed", async () => {

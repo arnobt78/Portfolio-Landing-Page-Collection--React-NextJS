@@ -45,6 +45,7 @@ const setAnimations = (gltf: GLTF) => {
     const introAction = mixer.clipAction(introClip!);
     introAction.clampWhenFinished = true;
     introAction.reset().play();
+    clearTimeout(blinkTimer);
     blinkTimer = setTimeout(() => {
       const blink = gltf.animations.find((clip) => clip.name === "Blink");
       if (blink) mixer.clipAction(blink).play().fadeIn(0.5);

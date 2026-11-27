@@ -24,6 +24,7 @@ const setLighting = (scene: THREE.Scene, onEnvironmentReady?: () => void) => {
 
   let disposed = false;
   let lightsOn = false;
+  let rimTween: gsap.core.Tween | undefined;
   let environment: THREE.Texture | undefined;
   new RGBELoader()
     .setPath("/models/")
@@ -53,7 +54,8 @@ const setLighting = (scene: THREE.Scene, onEnvironmentReady?: () => void) => {
     if (reducedMotion) {
       gsap.killTweensOf(scene);
       gsap.killTweensOf(directionalLight);
-      gsap.killTweensOf(".character-rim");
+      rimTween?.kill();
+      rimTween = undefined;
       scene.environmentIntensity = 0.64;
       directionalLight.intensity = 1;
       gsap.set(".character-rim", { y: "55%", opacity: 1 });
@@ -69,7 +71,8 @@ const setLighting = (scene: THREE.Scene, onEnvironmentReady?: () => void) => {
       duration: duration,
       ease: ease,
     });
-    gsap.to(".character-rim", {
+    rimTween?.kill();
+    rimTween = gsap.to(".character-rim", {
       y: "55%",
       opacity: 1,
       delay: 0.2,
@@ -81,6 +84,8 @@ const setLighting = (scene: THREE.Scene, onEnvironmentReady?: () => void) => {
     disposed = true;
     gsap.killTweensOf(scene);
     gsap.killTweensOf(directionalLight);
+    rimTween?.kill();
+    rimTween = undefined;
     directionalLight.shadow.dispose();
     pointLight.shadow.dispose();
     environment?.dispose();

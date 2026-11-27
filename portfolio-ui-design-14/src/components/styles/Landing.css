@@ -356,3 +356,8 @@ h2.landing-info-h2 {
     font-size: 75px;
   }
 }
+
+/* Only the face target should receive pointer input; a fallback must not cover page controls. */
+.character-model { pointer-events: none; }
+.character-hover { pointer-events: auto; }
+.portfolio-no-intro .character-hover { pointer-events: none; }

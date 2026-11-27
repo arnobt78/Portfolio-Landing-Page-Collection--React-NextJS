@@ -25,6 +25,33 @@ export function disposeCharacter(root: THREE.Object3D) {
   geometries.forEach((geometry) => geometry.dispose());
 }
 
+// Reject promptly when parsing or shader compilation outlives the scene.
+// A parsed result arriving after cancellation still owns GPU resources and must be disposed.
+function waitForResult<T>(signal: AbortSignal, task: Promise<T>, disposeLate?: (value: T) => void): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      signal.removeEventListener("abort", onAbort);
+      reject(new DOMException("Cancelled", "AbortError"));
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+    if (signal.aborted) onAbort();
+    task.then((value) => {
+      if (settled) { disposeLate?.(value); return; }
+      settled = true;
+      signal.removeEventListener("abort", onAbort);
+      resolve(value);
+    }, (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      signal.removeEventListener("abort", onAbort);
+      reject(error);
+    });
+  });
+}
+
 const setCharacter = (
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
@@ -43,9 +70,10 @@ const setCharacter = (
       const data = await decryptFile("/models/character.enc", "Character3D#@", signal);
       if (signal.aborted) throw new DOMException("Cancelled", "AbortError");
       // Parsing the buffer directly avoids retaining an object URL for the model.
-      gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(data, "", resolve, reject));
+      gltf = await waitForResult(signal, new Promise<GLTF>((resolve, reject) => loader.parse(data, "", resolve, reject)),
+        (lateGltf) => disposeCharacter(lateGltf.scene));
       if (signal.aborted) throw new DOMException("Cancelled", "AbortError");
-      await renderer.compileAsync(gltf.scene, camera, scene);
+      await waitForResult(signal, renderer.compileAsync(gltf.scene, camera, scene));
       if (signal.aborted) throw new DOMException("Cancelled", "AbortError");
       gltf.scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {

@@ -29,7 +29,7 @@ const WhatIDo = () => {
         </h2>
       </div>
       <div className="what-box">
-        <div className="what-box-in">
+        <div className={`what-box-in${active !== null ? " what-has-active" : ""}`}>
           <div className="what-border2">
             <svg width="100%">
               <line

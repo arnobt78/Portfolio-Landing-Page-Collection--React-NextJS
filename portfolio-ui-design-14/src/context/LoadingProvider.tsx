@@ -7,6 +7,8 @@ interface LoadingType {
   setLoading: (percent: number) => void;
   finishLoading: (mode?: "ready" | "fallback") => void;
   skipEntrance: boolean;
+  isFallback: () => boolean;
+  fallbackActive: boolean;
 }
 
 // Shared loader controls allow the page to recover independently of WebGL.
@@ -17,9 +19,16 @@ export const LoadingProvider = ({ children }: PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loading, setLoading] = useState(0);
   const [skipEntrance, setSkipEntrance] = useState(false);
+  const [fallbackActive, setFallbackActive] = useState(false);
   const finished = useRef(false);
+  const fallback = useRef(false);
+  const isFallback = useCallback(() => fallback.current, []);
 
   const finishLoading = useCallback((mode: "ready" | "fallback" = "fallback") => {
+    if (mode === "fallback" && !fallback.current) {
+      fallback.current = true;
+      setFallbackActive(true);
+    }
     if (finished.current) {
       // A later WebGL failure must reveal sections formerly driven by the 3D timeline.
       if (mode === "fallback") {
@@ -40,7 +49,7 @@ export const LoadingProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   return (
-    <LoadingContext.Provider value={{ isLoading, setIsLoading, setLoading, finishLoading, skipEntrance }}>
+    <LoadingContext.Provider value={{ isLoading, setIsLoading, setLoading, finishLoading, skipEntrance, isFallback, fallbackActive }}>
       {isLoading && <Loading percent={loading} />}
       <main className="main-body">{children}</main>
     </LoadingContext.Provider>
