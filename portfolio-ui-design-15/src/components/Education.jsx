@@ -28,9 +28,9 @@ const Education = () => {
                     >
                         <div className="relative">
                             <span className="absolute -left-[41px] top-0 w-5 h-5 rounded-full bg-blue-600 border-4 border-white dark:border-black box-content shadow-sm" />
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Bachelor of Technology (B.Tech)</h3>
+                            <h3 className="text-xl font-bold text-white">Bachelor of Technology (B.Tech)</h3>
                             <p className="text-blue-600 dark:text-blue-400 mt-1 font-medium">Guru Gobind Singh Indraprastha University (GGSIPU)</p>
-                            <p className="text-slate-600 dark:text-gray-400 mt-2 text-sm leading-relaxed">
+                            <p className="text-gray-300 mt-2 text-sm leading-relaxed">
                                 Relevant Coursework: Data Structures, Algorithms, Web Development, Database Management Systems, OOPs.
                             </p>
                         </div>

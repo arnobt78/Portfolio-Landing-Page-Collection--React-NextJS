@@ -1,9 +1,8 @@
 /**
- * Fixed top navigation: logo/name, in-page scroll links (react-scroll), Resume link,
+ * Fixed top navigation: logo/name, in-page section links, Resume link,
  * and responsive mobile menu (hamburger + AnimatePresence). Navbar style changes on scroll (e.g. background).
  */
-import React, { useState, useEffect } from "react";
-import { Link } from "react-scroll";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { USER_DETAILS } from "../data/constants";
@@ -11,6 +10,7 @@ import { USER_DETAILS } from "../data/constants";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const menuButtonRef = useRef(null);
 
   /* Track scroll position to toggle navbar background (e.g. transparent vs solid); cleanup on unmount. */
   useEffect(() => {
@@ -20,6 +20,18 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   /* Section IDs must match the id attributes on the corresponding sections (e.g. #about, #skills). */
   const navLinks = [
@@ -45,7 +57,7 @@ const Navbar = () => {
           animate={{ opacity: 1, x: 0 }}
           className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 cursor-pointer"
         >
-          {USER_DETAILS.name}
+          {USER_DETAILS.names}
         </motion.div>
 
         {/* Desktop Menu */}
@@ -57,14 +69,12 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link
-                to={link.to}
-                smooth={true}
-                duration={500}
+              <a
+                href={`#${link.to}`}
                 className="text-gray-300 hover:text-white cursor-pointer transition-colors text-sm font-medium tracking-wide uppercase"
               >
                 {link.name}
-              </Link>
+              </a>
             </motion.div>
           ))}
 
@@ -80,7 +90,7 @@ const Navbar = () => {
 
         {/* Mobile Toggle */}
         <div className="md:hidden flex items-center gap-4">
-          <button onClick={() => setIsOpen(!isOpen)} className="text-white">
+          <button ref={menuButtonRef} type="button" onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? "Close menu" : "Open menu"} aria-expanded={isOpen} aria-controls="mobile-menu" className="text-white">
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
@@ -90,6 +100,7 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -97,16 +108,14 @@ const Navbar = () => {
           >
             <div className="flex flex-col items-center space-y-6 py-10">
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.name}
-                  to={link.to}
-                  smooth={true}
-                  duration={500}
+                  href={`#${link.to}`}
                   onClick={() => setIsOpen(false)}
                   className="text-xl text-gray-300 hover:text-white cursor-pointer transition-colors"
                 >
                   {link.name}
-                </Link>
+                </a>
               ))}
             </div>
           </motion.div>

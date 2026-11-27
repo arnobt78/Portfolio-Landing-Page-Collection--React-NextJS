@@ -9,6 +9,11 @@
 
 /* Base styles applied to body: background, text color, font, antialiasing */
 @layer base {
+    html { scroll-behavior: smooth; }
+    section[id] { scroll-margin-top: 6rem; }
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+    }
     body {
         @apply bg-black text-white font-sans antialiased;
     }

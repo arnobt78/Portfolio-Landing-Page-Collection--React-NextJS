@@ -23,3 +23,7 @@ The user approved the listed Git metadata cleanup and execution of the complete 
 - 2026-11-25: User approved project 13 modernization under C1-P13-20261125 (REQ-0005–REQ-0009).
 
 - 2026-11-25: User approved project 14 modernization under C1-P14-20261125 (REQ-0005–REQ-0009).
+
+- 2026-11-28: User approved project 15 modernization under C1-P15-20261128 (REQ-0001, REQ-0005–REQ-0009). Publication remains a separate decision.
+
+- 2026-11-28: User authorized project 15 final verification, security review, and publication through preview-branch PR and squash merge into main.

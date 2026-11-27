@@ -1,15 +1,16 @@
 /**
  * Projects section: grid of project cards (image, title, short description). Clicking a card
- * opens a modal (AnimatePresence) with full description, tech tags, and "View Live Project" link.
+ * opens a modal with full description, tech tags, and "View Live Project" link.
  * layoutId on card and modal enables shared layout animation in Framer Motion.
  */
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { PROJECTS } from "../data/constants";
 import { ExternalLink, X } from "lucide-react";
 
 const Projects = () => {
     const [selectedId, setSelectedId] = useState(null);
+    const openerRef = useRef(null);
 
     return (
         <section id="projects" className="py-20 bg-black relative transition-colors duration-300">
@@ -31,7 +32,20 @@ const Projects = () => {
                         <motion.div
                             layoutId={project.id}
                             key={project.id}
-                            onClick={() => setSelectedId(project.id)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`View details for ${project.title}`}
+                            onClick={(event) => {
+                                openerRef.current = event.currentTarget;
+                                setSelectedId(project.id);
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    openerRef.current = event.currentTarget;
+                                    setSelectedId(project.id);
+                                }
+                            }}
                             className="cursor-pointer group bg-zinc-900 border border-white/5 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 relative"
                             whileHover={{ y: -5 }}
                         >
@@ -60,77 +74,64 @@ const Projects = () => {
                     ))}
                 </div>
 
-                {/* Modal for selected project: backdrop click closes; layoutId ties card and modal for animation. */}
-                <AnimatePresence>
-                    {selectedId && (
-                        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm p-4">
-                            {PROJECTS.map(
-                                (project) =>
-                                    project.id === selectedId && (
-                                        <motion.div
-                                            layoutId={selectedId}
-                                            key={project.id}
-                                            className="bg-zinc-900 w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedId(null);
-                                                }}
-                                                className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full z-10 transition-colors"
-                                            >
-                                                <X size={20} />
-                                            </button>
-
-                                            <motion.div className="relative h-64 md:h-80">
-                                                <motion.img
-                                                    src={project.image}
-                                                    alt={project.title}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                                                <motion.div className="absolute bottom-6 left-6 right-6">
-                                                    <motion.h3 className="text-3xl font-bold text-white mb-2">
-                                                        {project.title}
-                                                    </motion.h3>
-                                                </motion.div>
-                                            </motion.div>
-
-                                            <motion.div className="p-8">
-                                                <motion.p className="text-gray-300 text-lg leading-relaxed mb-6">
-                                                    {project.description}
-                                                </motion.p>
-
-                                                <div className="mb-8">
-                                                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Technologies</h4>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {project.tech.map((tech) => (
-                                                            <span key={tech} className="px-3 py-1 bg-blue-900/30 text-blue-300 rounded-full text-sm font-medium">
-                                                                {tech}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <motion.a
-                                                    href={project.liveLink}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors w-full md:w-auto justify-center shadow-lg shadow-blue-500/20"
-                                                >
-                                                    View Live Project <ExternalLink size={18} />
-                                                </motion.a>
-                                            </motion.div>
-                                        </motion.div>
-                                    )
-                            )}
-                        </div>
-                    )}
-                </AnimatePresence>
+                {selectedId !== null && (
+                    <ProjectDialog
+                        project={PROJECTS.find((project) => project.id === selectedId)}
+                        openerRef={openerRef}
+                        onClose={() => setSelectedId(null)}
+                    />
+                )}
             </div>
         </section>
     );
 };
 
 export default Projects;
+
+// Native modal dialogs contain keyboard focus and restore it to the opening card.
+function ProjectDialog({ project, onClose, openerRef }) {
+    const dialogRef = useRef(null);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        const opener = openerRef.current;
+        dialog.showModal();
+        return () => {
+            dialog.close();
+            opener?.focus();
+        };
+    }, [openerRef]);
+
+    return (
+        <dialog
+            ref={dialogRef}
+            aria-labelledby="project-dialog-title"
+            onCancel={(event) => { event.preventDefault(); onClose(); }}
+            onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
+            className="m-auto w-[calc(100%-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-zinc-900 text-white shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+        >
+            <motion.div layoutId={project.id} className="relative">
+                <button type="button" onClick={onClose} aria-label="Close project details" className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full z-10 transition-colors">
+                    <X size={20} />
+                </button>
+                <div className="relative h-64 md:h-80">
+                    <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    <h3 id="project-dialog-title" className="absolute bottom-6 left-6 right-6 text-3xl font-bold text-white">{project.title}</h3>
+                </div>
+                <div className="p-8">
+                    <p className="text-gray-300 text-lg leading-relaxed mb-6">{project.description}</p>
+                    <div className="mb-8">
+                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Technologies</h4>
+                        <div className="flex flex-wrap gap-2">
+                            {project.tech.map((tech) => <span key={tech} className="px-3 py-1 bg-blue-900/30 text-blue-300 rounded-full text-sm font-medium">{tech}</span>)}
+                        </div>
+                    </div>
+                    <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors w-full md:w-auto justify-center shadow-lg shadow-blue-500/20">
+                        View Live Project <ExternalLink size={18} />
+                    </a>
+                </div>
+            </motion.div>
+        </dialog>
+    );
+}

@@ -2,9 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-19.2-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-7.2-green)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.18-blue)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.33-orange)](https://www.framer.com/motion/)
+[![Vite](https://img.shields.io/badge/Vite-8.4-green)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.3-blue)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-14-orange)](https://www.framer.com/motion/)
 
 A **single-page portfolio demo** built with React, Vite, JavaScript, TailwindCSS, and Framer Motion. It is intended for learning and instruction: you can run it locally, customize content via a central data file, and reuse its components (navbar, hero, about, skills, projects, education, contact, footer) in your own projects. The app is frontend-only (no backend or API); all content is driven by in-repo data and assets.
 
@@ -45,7 +45,7 @@ A **single-page portfolio demo** built with React, Vite, JavaScript, TailwindCSS
 
 ## How to run and use
 
-**Prerequisites:** Node.js (v18+ recommended) and npm.
+**Prerequisites:** Node.js 26.x and npm.
 
 1. **Clone and install**
 
@@ -68,6 +68,8 @@ A **single-page portfolio demo** built with React, Vite, JavaScript, TailwindCSS
    ```bash
    npm run lint
    ```
+
+   Run the focused interaction regression tests with `npm test`.
 
 4. **Production build**
 
@@ -115,6 +117,7 @@ portfolio-ui-15/
 │   │   ├── Contact.jsx     # Social links + mailto
 │   │   ├── Footer.jsx      # Copyright + tech stack note
 │   │   └── 3d/
+│   │       ├── Starfield.jsx       # Lazy loading, reduced motion and failure handling
 │   │       └── FloatingShapes.jsx  # Three.js starfield background
 │   └── assets/             # Images (e.g. profile, project thumbnails)
 ├── public/                 # Static assets (e.g. favicon.ico)
@@ -134,7 +137,7 @@ portfolio-ui-15/
 | Animation     | Framer Motion 12                                       |
 | 3D / Canvas   | Three.js, @react-three/fiber, @react-three/drei, maath |
 | Icons         | lucide-react, react-icons                              |
-| Smooth scroll | react-scroll                                           |
+| Smooth scroll | Native section links and CSS                           |
 | Lint          | ESLint (flat config), React Hooks, React Refresh       |
 
 ---
@@ -142,7 +145,7 @@ portfolio-ui-15/
 ## Functionalities and features
 
 - **Single-page layout:** One HTML page; sections: Hero, About, Skills, Projects, Education, Contact; Footer.
-- **In-page navigation:** Navbar and Hero CTAs use `react-scroll` to smooth-scroll to section IDs (`#about`, `#skills`, `#projects`, `#education`, `#contact`).
+- **In-page navigation:** Navbar and Hero CTAs use native links to scroll to section IDs (`#about`, `#skills`, `#projects`, `#education`, `#contact`).
 - **Responsive navbar:** Fixed top bar; desktop links + optional “Resume” link; mobile hamburger with AnimatePresence.
 - **Hero:** Headline, short bio from data, “View Work” / “Contact Me” buttons, 3D starfield background (FloatingShapes).
 - **About:** Profile image (or placeholder), bio, and highlight cards (e.g. Fresh Perspective, MERN Specialist).
@@ -162,14 +165,14 @@ Each section is a React component that reads from `src/data/constants.js`. To re
 
 1. Copy the component file and any assets it uses (images, etc.).
 2. Copy the relevant part of `constants.js` (e.g. `USER_DETAILS`, `PROJECTS`, or `SKILLS`).
-3. Install the same dependencies (e.g. `framer-motion`, `react-scroll`, `lucide-react`, `react-icons`). For `FloatingShapes`, add `three`, `@react-three/fiber`, `@react-three/drei`, `maath`.
+3. Install the same dependencies (e.g. `framer-motion`, `lucide-react`, `react-icons`). For `FloatingShapes`, add `three`, `@react-three/fiber`, `@react-three/drei`, `maath`.
 4. Ensure your Tailwind (or CSS) includes the classes used by the component (or replace with your own styles).
 
 **Example – using only the Skills block:**  
 Copy `Skills.jsx` and the `SKILLS` export from `constants.js`; render `<Skills />` where you need it and style the container as needed.
 
 **Example – using Hero without 3D:**  
-Copy `Hero.jsx`, remove the `<FloatingShapes />` import and usage, and keep the rest (motion, `USER_DETAILS`, `Link` from `react-scroll`).
+Copy `Hero.jsx`, remove the `<Starfield />` import and usage, and keep the rest (motion, `USER_DETAILS`, and native links).
 
 ---
 
@@ -180,7 +183,7 @@ Copy `Hero.jsx`, remove the `<FloatingShapes />` import and usage, and keep the 
   - `PROJECTS`: id, title, description, tech[], liveLink, image.
   - `SKILLS`: array of `{ category, items[] }`.
 
-- **“Routes”:** There are no URL routes. The app is one page; “navigation” is scroll-to-section via `react-scroll` and section IDs. For deployment, `vercel.json` rewrites all paths to `index.html` so the SPA works on static hosts.
+- **“Routes”:** There are no URL routes. The app is one page; “navigation” is native links to section IDs. For deployment, `vercel.json` rewrites all paths to `index.html` so the SPA works on static hosts.
 
 ---
 
@@ -229,11 +232,7 @@ export default function MyComponent() {
 **Smooth scroll to a section**
 
 ```jsx
-import { Link } from "react-scroll";
-
-<Link to="projects" smooth duration={500}>
-  View Projects
-</Link>;
+<a href="#projects">View Projects</a>;
 ```
 
 **Scroll-triggered animation with Framer Motion**
