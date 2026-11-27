@@ -10,7 +10,7 @@ const About = () => {
   return (
     <section
       id="about"
-      className="py-20 bg-black transition-colors duration-300"
+      className="py-20 bg-black transition-colors duration-300 overflow-x-clip"
     >
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center gap-12">
@@ -28,7 +28,7 @@ const About = () => {
                 {USER_DETAILS.profileImage ? (
                   <img
                     src={USER_DETAILS.profileImage}
-                    alt={USER_DETAILS.name}
+                    alt={USER_DETAILS.names}
                     className="w-full h-full object-scale-down grayscale-0 hover:grayscale-0 transition-all duration-500"
                   />
                 ) : (

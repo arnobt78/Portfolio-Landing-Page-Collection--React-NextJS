@@ -58,3 +58,5 @@ Project 13: npm audit reports zero advisories after modernization. EmailJS VITE 
 Project 14: Node 26 npm audit reports zero advisories after dependency updates. The application is a static frontend with no repository API or Next.js image optimizer. Model, encrypted asset, local decoder and LFS pointer were preserved; the client-side model decryption mechanism does not constitute secret protection. Deployment settings and external assets were not verified.
 
 Project 14 independent security review identified no new backend or server-side credential surface. Post-load graphics failure and motion-preference handling were corrected and retested; browser-side model decryption remains an obfuscation mechanism, not confidentiality.
+
+Project 15: Independent review found a static frontend with no repository API, authentication or Next.js image optimizer. Node 26 full and production npm audits report zero vulnerabilities after removing an obsolete minimatch override; the baseline had 17 findings. External new-tab links use noopener and noreferrer. Live Vercel settings, headers and traffic were not verified or changed.

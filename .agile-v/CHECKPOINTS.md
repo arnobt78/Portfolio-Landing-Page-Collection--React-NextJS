@@ -20,5 +20,6 @@
 | Project 13 modernization plan | APPROVED | C1-P13-20261125 | See APPROVALS.md for user approval. |
 
 | Project 14 modernization plan | APPROVED | C1-P14-20261125 | See APPROVALS.md for user approval. |
+| Project 15 modernization plan | APPROVED | C1-P15-20261128 | User approved the scoped implementation plan. |
 
 This checkpoint approves the specified metadata cleanup and the project 04 and 01 implementation plan, including dependency installation. Deployment and release acceptance have not been approved.
