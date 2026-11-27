@@ -11,9 +11,11 @@ export function setCharTimeline(
   camera: THREE.PerspectiveCamera
 ) {
   let intensity: number = 0;
-  setInterval(() => {
+  const interval = setInterval(() => {
     intensity = Math.random();
   }, 200);
+  // Scope every timeline to this scene so remounts and resizes can dispose them.
+  const context = gsap.context(() => {
   const tl1 = gsap.timeline({
     scrollTrigger: {
       trigger: ".landing-section",
@@ -70,7 +72,7 @@ export function setCharTimeline(
   });
   const neckBone = character?.getObjectByName("spine005");
   if (window.innerWidth > 1024) {
-    if (character) {
+    if (character && neckBone && monitor && screenLight) {
       tl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
         .to(camera.position, { z: 22 }, 0)
@@ -94,9 +96,9 @@ export function setCharTimeline(
           0
         )
         .to(character.rotation, { y: 0.92, x: 0.12, delay: 3, duration: 3 }, 0)
-        .to(neckBone!.rotation, { x: 0.6, delay: 2, duration: 3 }, 0)
-        .to(monitor!.material, { opacity: 1, duration: 0.8, delay: 3.2 }, 0)
-        .to(screenLight!.material, { opacity: 1, duration: 0.8, delay: 4.5 }, 0)
+        .to(neckBone.rotation, { x: 0.6, delay: 2, duration: 3 }, 0)
+        .to(monitor.material, { opacity: 1, duration: 0.8, delay: 3.2 }, 0)
+        .to(screenLight.material, { opacity: 1, duration: 0.8, delay: 4.5 }, 0)
         .fromTo(
           ".what-box-in",
           { display: "none" },
@@ -104,7 +106,7 @@ export function setCharTimeline(
           0
         )
         .fromTo(
-          monitor!.position,
+          monitor.position,
           { y: -10, z: 2 },
           { y: 0, z: 0, delay: 1.5, duration: 3 },
           0
@@ -138,10 +140,13 @@ export function setCharTimeline(
       tM2.to(".what-box-in", { display: "flex", duration: 0.1, delay: 0 }, 0);
     }
   }
+  });
+  return () => { clearInterval(interval); context.revert(); };
 }
 
 /** Career section timeline: timeline height, opacity, and info box stagger */
 export function setAllTimeline() {
+  const context = gsap.context(() => {
   const careerTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".career-section",
@@ -197,4 +202,6 @@ export function setAllTimeline() {
       0
     );
   }
+  });
+  return () => context.revert();
 }

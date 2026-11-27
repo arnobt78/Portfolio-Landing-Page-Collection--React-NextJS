@@ -1,34 +1,23 @@
 /**
  * "What I Do" section: two content cards (Develop / Design). On touch devices,
- * cards are click-to-expand; handleClick toggles active state and sibling styling.
+ * cards can be expanded by pointer or keyboard, with sibling styling.
  */
-import { useEffect, useRef } from "react";
+import { useState, type KeyboardEvent } from "react";
 import "./styles/WhatIDo.css";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const WhatIDo = () => {
-  const containerRef = useRef<(HTMLDivElement | null)[]>([]);
-  const setRef = (el: HTMLDivElement | null, index: number) => {
-    containerRef.current[index] = el;
+  const [active, setActive] = useState<number | null>(null);
+  const toggle = (index: number) => setActive((current) => current === index ? null : index);
+  const onKey = (event: KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggle(index); }
   };
-  useEffect(() => {
-    const containers = containerRef.current;
-    if (ScrollTrigger.isTouch) {
-      containers.forEach((container) => {
-        if (container) {
-          container.classList.remove("what-noTouch");
-          container.addEventListener("click", () => handleClick(container));
-        }
-      });
-    }
-    return () => {
-      containers.forEach((container) => {
-        if (container) {
-          container.removeEventListener("click", () => handleClick(container));
-        }
-      });
-    };
-  }, []);
+  const cardClass = (index: number) => [
+    "what-content",
+    !ScrollTrigger.isTouch && "what-noTouch",
+    active === index && "what-content-active",
+    active !== null && active !== index && "what-sibling",
+  ].filter(Boolean).join(" ");
   return (
     <div className="whatIDO">
       <div className="what-box">
@@ -64,8 +53,8 @@ const WhatIDo = () => {
             </svg>
           </div>
           <div
-            className="what-content what-noTouch"
-            ref={(el) => setRef(el, 0)}
+            className={cardClass(0)} role="button" tabIndex={0} aria-expanded={active === 0}
+            onClick={() => toggle(0)} onKeyDown={(event) => onKey(event, 0)}
           >
             <div className="what-border1">
               <svg height="100%">
@@ -115,8 +104,8 @@ const WhatIDo = () => {
             </div>
           </div>
           <div
-            className="what-content what-noTouch"
-            ref={(el) => setRef(el, 1)}
+            className={cardClass(1)} role="button" tabIndex={0} aria-expanded={active === 1}
+            onClick={() => toggle(1)} onKeyDown={(event) => onKey(event, 1)}
           >
             <div className="what-border1">
               <svg height="100%">
@@ -160,19 +149,3 @@ const WhatIDo = () => {
 };
 
 export default WhatIDo;
-
-/** Toggle expanded card and dim non-active siblings on touch devices */
-function handleClick(container: HTMLDivElement) {
-  container.classList.toggle("what-content-active");
-  container.classList.remove("what-sibling");
-  if (container.parentElement) {
-    const siblings = Array.from(container.parentElement.children);
-
-    siblings.forEach((sibling) => {
-      if (sibling !== container) {
-        sibling.classList.remove("what-content-active");
-        sibling.classList.toggle("what-sibling");
-      }
-    });
-  }
-}

@@ -14,9 +14,11 @@ async function generateAESKey(password: string): Promise<CryptoKey> {
 /** Decrypt file at url with password; expects first 16 bytes = IV, rest = ciphertext */
 export const decryptFile = async (
   url: string,
-  password: string
+  password: string,
+  signal?: AbortSignal
 ): Promise<ArrayBuffer> => {
-  const response = await fetch(url);
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error(`Model request failed (${response.status})`);
   const encryptedData = await response.arrayBuffer();
   const iv = new Uint8Array(encryptedData.slice(0, 16));
   const data = encryptedData.slice(16);

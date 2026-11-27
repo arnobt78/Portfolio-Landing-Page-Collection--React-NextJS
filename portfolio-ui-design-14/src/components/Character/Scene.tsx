@@ -1,171 +1,248 @@
-/**
- * Three.js character scene: renderer, camera, GLB load via setCharacter,
- * lighting and animations. Progress is reported with setProgress; when loaded(),
- * intro runs. Mouse/touch drive head rotation (headBone). Single useEffect
- * sets up and cleans up on unmount.
- */
+/** The character scene is optional: loading or graphics failures must not block the page. */
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import setCharacter from "./utils/character";
+import setCharacter, { disposeCharacter } from "./utils/character";
 import setLighting from "./utils/lighting";
 import { useLoading } from "../../context/LoadingProvider";
 import handleResize from "./utils/resizeUtils";
-import {
-  handleMouseMove,
-  handleTouchEnd,
-  handleHeadRotation,
-  handleTouchMove,
-} from "./utils/mouseUtils";
+import { handleMouseMove, handleTouchEnd, handleHeadRotation, handleTouchMove } from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
 import { setProgress } from "../Loading";
+import { setCharTimeline, setAllTimeline } from "../utils/GsapScroll";
 
 const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
   const hoverDivRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef(new THREE.Scene());
-  const { setLoading } = useLoading();
+  const [unavailable, setUnavailable] = useState(false);
+  const { setLoading, finishLoading } = useLoading();
 
-  const [character, setChar] = useState<THREE.Object3D | null>(null);
   useEffect(() => {
     const canvasEl = canvasDiv.current;
-    if (canvasEl) {
-      const rect = canvasEl.getBoundingClientRect();
-      const container = { width: rect.width, height: rect.height };
-      const aspect = container.width / container.height;
-      const scene = sceneRef.current;
+    if (!canvasEl) return;
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    } catch {
+      // Renderer creation can fail synchronously when WebGL is unavailable.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUnavailable(true);
+      finishLoading();
+      return;
+    }
 
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true,
-      });
-      renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1;
-      canvasEl.appendChild(renderer.domElement);
+    const scene = new THREE.Scene();
+    const rect = canvasEl.getBoundingClientRect();
+    renderer.setSize(rect.width, rect.height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1;
+    canvasEl.appendChild(renderer.domElement);
+    const camera = new THREE.PerspectiveCamera(14.5, rect.height ? rect.width / rect.height : 1, 0.1, 1000);
+    camera.position.set(0, 13.1, 24.7);
+    camera.zoom = 1.1;
+    camera.updateProjectionMatrix();
 
-      const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
-      camera.position.z = 10;
-      camera.position.set(0, 13.1, 24.7);
-      camera.zoom = 1.1;
-      camera.updateProjectionMatrix();
+    const abort = new AbortController();
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let renderStatic = () => {};
+    const light = setLighting(scene, () => renderStatic());
+    const progress = setProgress(setLoading);
+    const { loadCharacter } = setCharacter(renderer, scene, camera);
+    const clock = new THREE.Clock();
+    let active = true;
+    let failed = false;
+    let frame = 0;
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+    let introTimer: ReturnType<typeof setTimeout> | undefined;
+    let touchTimer: ReturnType<typeof setTimeout> | undefined;
+    let cancelTouchReset: (() => void) | undefined;
+    let removeHover: (() => void) | undefined;
+    let clearTimelines: (() => void) | undefined;
+    let animations: ReturnType<typeof setAnimations> | undefined;
+    let model: THREE.Object3D | undefined;
+    let headBone: THREE.Object3D | null = null;
+    let screenLight: THREE.Object3D | null = null;
+    let mouse = { x: 0, y: 0 };
+    let interpolation = { x: 0.1, y: 0.2 };
+    let touchTracking = false;
 
-      let headBone: THREE.Object3D | null = null;
-      let screenLight: THREE.Object3D | null = null;
-      let mixer: THREE.AnimationMixer;
-
-      const clock = new THREE.Clock();
-
-      const light = setLighting(scene);
-      const progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera);
-
-      loadCharacter().then((gltf) => {
-        if (gltf) {
-          const animations = setAnimations(gltf);
-          if (hoverDivRef.current) {
-            animations.hover(gltf, hoverDivRef.current);
-          }
-          mixer = animations.mixer;
-          const character = gltf.scene;
-          setChar(character);
-          scene.add(character);
-          headBone = character.getObjectByName("spine006") || null;
-          screenLight = character.getObjectByName("screenlight") || null;
-          /* Wait for loader UI to reach 100%, then play intro and turn on lights */
-          progress.loaded().then(() => {
-            setTimeout(() => {
-              light.turnOnLights();
-              animations.startIntro();
-            }, 2500);
-          });
-          window.addEventListener("resize", () =>
-            handleResize(renderer, camera, canvasDiv, character)
-          );
-        }
-      });
-
-      let mouse = { x: 0, y: 0 },
-        interpolation = { x: 0.1, y: 0.2 };
-
-      const onMouseMove = (event: MouseEvent) => {
-        handleMouseMove(event, (x, y) => (mouse = { x, y }));
-      };
-      let debounce: number | undefined;
-      const onTouchStart = (event: TouchEvent) => {
-        const element = event.target as HTMLElement;
-        debounce = setTimeout(() => {
-          element?.addEventListener("touchmove", (e: TouchEvent) =>
-            handleTouchMove(e, (x, y) => (mouse = { x, y }))
-          );
-        }, 200);
-      };
-
-      const onTouchEnd = () => {
-        handleTouchEnd((x, y, interpolationX, interpolationY) => {
-          mouse = { x, y };
-          interpolation = { x: interpolationX, y: interpolationY };
-        });
-      };
-
-      document.addEventListener("mousemove", (event) => {
-        onMouseMove(event);
-      });
-      const landingDiv = document.getElementById("landingDiv");
-      if (landingDiv) {
-        landingDiv.addEventListener("touchstart", onTouchStart);
-        landingDiv.addEventListener("touchend", onTouchEnd);
+    // Release partially initialized resources too, not only successfully loaded scenes.
+    const releaseModel = () => {
+      removeHover?.();
+      removeHover = undefined;
+      clearTimelines?.();
+      clearTimelines = undefined;
+      animations?.dispose();
+      animations = undefined;
+      headBone = null;
+      screenLight = null;
+      if (model) {
+        scene.remove(model);
+        disposeCharacter(model);
+        model = undefined;
       }
-      const animate = () => {
-        requestAnimationFrame(animate);
+    };
+    const failScene = () => {
+      if (!active || failed) return;
+      failed = true;
+      cancelAnimationFrame(frame);
+      abort.abort();
+      clearTimeout(resizeTimer);
+      clearTimeout(introTimer);
+      clearTimeout(touchTimer);
+      cancelTouchReset?.();
+      progress.cancel();
+      releaseModel();
+      light.dispose();
+      setUnavailable(true);
+      finishLoading();
+    };
+    const refreshTimelines = () => {
+      if (!model) return;
+      clearTimelines?.();
+      clearTimelines = undefined;
+      if (motionPreference.matches) return;
+      const clearCharacter = setCharTimeline(model, camera);
+      try {
+        const clearCareer = setAllTimeline();
+        clearTimelines = () => { clearCharacter(); clearCareer(); };
+      } catch (error) {
+        clearCharacter();
+        throw error;
+      }
+    };
+    const onResize = () => {
+      handleResize(renderer, camera, canvasDiv);
+      renderStatic();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        try { refreshTimelines(); } catch { failScene(); }
+      }, 150);
+    };
+    const onMouseMove = (event: MouseEvent) => handleMouseMove(event, (x, y) => { mouse = { x, y }; });
+    const onTouchStart = () => {
+      cancelTouchReset?.();
+      clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => { touchTracking = true; }, 200);
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (touchTracking && event.touches.length) handleTouchMove(event, (x, y) => { mouse = { x, y }; });
+    };
+    const onTouchEnd = () => {
+      clearTimeout(touchTimer);
+      touchTracking = false;
+      cancelTouchReset?.();
+      cancelTouchReset = handleTouchEnd((x, y, interpolationX, interpolationY) => {
+        mouse = { x, y };
+        interpolation = { x: interpolationX, y: interpolationY };
+      });
+    };
+    const onContextLost = () => failScene();
+    window.addEventListener("resize", onResize);
+    document.addEventListener("mousemove", onMouseMove);
+    renderer.domElement.addEventListener("webglcontextlost", onContextLost);
+    const landing = document.getElementById("landingDiv");
+    landing?.addEventListener("touchstart", onTouchStart, { passive: true });
+    landing?.addEventListener("touchmove", onTouchMove, { passive: true });
+    landing?.addEventListener("touchend", onTouchEnd);
+    landing?.addEventListener("touchcancel", onTouchEnd);
+
+    const animate = () => {
+      if (!active || failed) return;
+      frame = 0;
+      if (!motionPreference.matches) {
+        frame = requestAnimationFrame(animate);
         if (headBone) {
-          handleHeadRotation(
-            headBone,
-            mouse.x,
-            mouse.y,
-            interpolation.x,
-            interpolation.y,
-            THREE.MathUtils.lerp
-          );
+          handleHeadRotation(headBone, mouse.x, mouse.y, interpolation.x, interpolation.y, THREE.MathUtils.lerp);
           light.setPointLight(screenLight);
         }
-        const delta = clock.getDelta();
-        if (mixer) {
-          mixer.update(delta);
-        }
-        renderer.render(scene, camera);
-      };
-      animate();
-      return () => {
-        clearTimeout(debounce);
-        scene.clear();
-        renderer.dispose();
-        window.removeEventListener("resize", () =>
-          handleResize(renderer, camera, canvasDiv, character!)
-        );
-        if (canvasEl && renderer.domElement.parentNode === canvasEl) {
-          canvasEl.removeChild(renderer.domElement);
-        }
-        if (landingDiv) {
-          document.removeEventListener("mousemove", onMouseMove);
-          landingDiv.removeEventListener("touchstart", onTouchStart);
-          landingDiv.removeEventListener("touchend", onTouchEnd);
-        }
-      };
-    }
-    // Intentionally run once on mount; character/setLoading would cause re-setup
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+        animations?.mixer.update(clock.getDelta());
+      }
+      try { renderer.render(scene, camera); } catch { failScene(); }
+    };
+    // Render on asset or layout changes, without a continuous animation loop.
+    renderStatic = () => { if (motionPreference.matches) animate(); };
+    const onMotionChange = () => {
+      if (!active || failed) return;
+      clearTimeout(introTimer);
+      if (motionPreference.matches) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        clearTimelines?.();
+        clearTimelines = undefined;
+        if (model) light.turnOnLights(true);
+        renderStatic();
+      } else {
+        try {
+          if (model) {
+            refreshTimelines();
+            light.turnOnLights();
+            animations?.startIntro();
+          }
+          clock.getDelta();
+          if (!frame) animate();
+        } catch { failScene(); }
+      }
+    };
+    motionPreference.addEventListener("change", onMotionChange);
+    animate();
+
+    loadCharacter(abort.signal).then((gltf) => {
+      if (!active || abort.signal.aborted) { disposeCharacter(gltf.scene); return; }
+      model = gltf.scene;
+      animations = setAnimations(gltf);
+      if (hoverDivRef.current) removeHover = animations.hover(gltf, hoverDivRef.current);
+      scene.add(model);
+      headBone = model.getObjectByName("spine006") || null;
+      screenLight = model.getObjectByName("screenlight") || null;
+      refreshTimelines();
+      if (motionPreference.matches) {
+        light.turnOnLights(true);
+        renderStatic();
+      }
+      void progress.loaded().then(() => {
+        if (!active || failed || motionPreference.matches) return;
+        introTimer = setTimeout(() => {
+          if (!active || failed || motionPreference.matches) return;
+          light.turnOnLights();
+          animations?.startIntro();
+        }, 2500);
+      });
+    }).catch(failScene);
+
+    return () => {
+      active = false;
+      abort.abort();
+      cancelAnimationFrame(frame);
+      clearTimeout(resizeTimer);
+      clearTimeout(introTimer);
+      clearTimeout(touchTimer);
+      cancelTouchReset?.();
+      progress.cancel();
+      releaseModel();
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("mousemove", onMouseMove);
+      motionPreference.removeEventListener("change", onMotionChange);
+      renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
+      landing?.removeEventListener("touchstart", onTouchStart);
+      landing?.removeEventListener("touchmove", onTouchMove);
+      landing?.removeEventListener("touchend", onTouchEnd);
+      landing?.removeEventListener("touchcancel", onTouchEnd);
+      light.dispose();
+      scene.clear();
+      renderer.dispose();
+      renderer.domElement.remove();
+    };
+  }, [finishLoading, setLoading]);
 
   return (
-    <>
-      <div className="character-container">
-        <div className="character-model" ref={canvasDiv}>
-          <div className="character-rim"></div>
-          <div className="character-hover" ref={hoverDivRef}></div>
-        </div>
+    <div className="character-container">
+      <div className="character-model" ref={canvasDiv}>
+        <div className="character-rim"></div>
+        <div className="character-hover" ref={hoverDivRef}></div>
+        {unavailable && <p role="status" style={{ color: "white", textAlign: "center" }}>3D visual unavailable.</p>}
       </div>
-    </>
+    </div>
   );
 };
 

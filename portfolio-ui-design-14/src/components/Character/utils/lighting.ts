@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { RGBELoader } from "three-stdlib";
 import { gsap } from "gsap";
 
-const setLighting = (scene: THREE.Scene) => {
+const setLighting = (scene: THREE.Scene, onEnvironmentReady?: () => void) => {
   const directionalLight = new THREE.DirectionalLight(0xc7a9ff, 0);
   directionalLight.intensity = 0;
   directionalLight.position.set(-0.47, -0.32, -1);
@@ -22,14 +22,20 @@ const setLighting = (scene: THREE.Scene) => {
   pointLight.castShadow = true;
   scene.add(pointLight);
 
+  let disposed = false;
+  let lightsOn = false;
+  let environment: THREE.Texture | undefined;
   new RGBELoader()
     .setPath("/models/")
     .load("char_enviorment.hdr", function (texture) {
+      if (disposed) { texture.dispose(); return; }
+      environment = texture;
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = texture;
-      scene.environmentIntensity = 0;
+      scene.environmentIntensity = lightsOn ? 0.64 : 0;
       scene.environmentRotation.set(5.76, 85.85, 1);
-    });
+      onEnvironmentReady?.();
+    }, undefined, () => { /* Character lighting remains usable without the HDR. */ });
 
   function setPointLight(screenLight: THREE.Object3D | null) {
     if (!screenLight || !(screenLight as THREE.Mesh).material) return;
@@ -42,7 +48,17 @@ const setLighting = (scene: THREE.Scene) => {
   }
   const duration = 2;
   const ease = "power2.inOut";
-  function turnOnLights() {
+  function turnOnLights(reducedMotion = false) {
+    lightsOn = true;
+    if (reducedMotion) {
+      gsap.killTweensOf(scene);
+      gsap.killTweensOf(directionalLight);
+      gsap.killTweensOf(".character-rim");
+      scene.environmentIntensity = 0.64;
+      directionalLight.intensity = 1;
+      gsap.set(".character-rim", { y: "55%", opacity: 1 });
+      return;
+    }
     gsap.to(scene, {
       environmentIntensity: 0.64,
       duration: duration,
@@ -61,7 +77,17 @@ const setLighting = (scene: THREE.Scene) => {
     });
   }
 
-  return { setPointLight, turnOnLights };
+  function dispose() {
+    disposed = true;
+    gsap.killTweensOf(scene);
+    gsap.killTweensOf(directionalLight);
+    directionalLight.shadow.dispose();
+    pointLight.shadow.dispose();
+    environment?.dispose();
+    scene.environment = null;
+  }
+
+  return { setPointLight, turnOnLights, dispose };
 };
 
 export default setLighting;

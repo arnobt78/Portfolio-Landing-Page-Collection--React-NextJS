@@ -1,11 +1,11 @@
 # Portfolio Landing Page 14 - React, Vite, TypeScript, Three.js, GSAP, ScrollTrigger, Rapier, Post-processing Frontend Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.4.1-green)](https://vitejs.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue)](https://www.typescriptlang.org/)
-[![GSAP](https://img.shields.io/badge/GSAP-3.12.7-orange)](https://gsap.com/)
-[![Three.js](https://img.shields.io/badge/Three.js-0.168.0-black)](https://threejs.org/)
+[![React](https://img.shields.io/badge/React-19.3-blue)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.3-green)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![GSAP](https://img.shields.io/badge/GSAP-3.15-orange)](https://gsap.com/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.187-black)](https://threejs.org/)
 
 A single-page portfolio showcase built with React, Vite, and TypeScript. It features a 3D character on the landing section, scroll-driven animations with GSAP, a tech-stack 3D scene with physics (Rapier), and responsive layout. The project is frontend-only (no backend or API) and uses custom CSS for styling. It is intended for learning, instruction, and reuse as a portfolio template.
 
@@ -53,14 +53,13 @@ Portfolio Landing Page 14 is a **client-side only** application. It has no API e
 
 | Category       | Technology                                                           |
 | -------------- | -------------------------------------------------------------------- |
-| **Framework**  | React 18 (with hooks)                                                |
-| **Build**      | Vite 5                                                               |
+| **Framework**  | React 19 (with hooks)                                                |
+| **Build**      | Vite 8                                                               |
 | **Language**   | TypeScript 5                                                         |
 | **3D**         | Three.js, React Three Fiber, Drei, Rapier (physics), Post-processing |
 | **Animation**  | GSAP 3, ScrollTrigger, @gsap/react                                   |
 | **UI / Icons** | react-icons, react-fast-marquee                                      |
 | **Styling**    | Custom CSS (no Tailwind in this repo)                                |
-| **Analytics**  | @vercel/analytics (optional)                                         |
 
 ---
 
@@ -121,8 +120,8 @@ portfolio-ui-14/
 
 ### Prerequisites
 
-- **Node.js** (e.g. 18+)
-- **npm** (or yarn/pnpm)
+- **Node.js** 26.x
+- **npm** and Git LFS (for the tracked GLB asset)
 
 ### Install and run
 
@@ -176,6 +175,7 @@ This project **does not use any environment variables** in the source code. Ther
 | `npm run build`   | TypeScript build + Vite production build (`tsc -b && vite build`) |
 | `npm run preview` | Serve the `dist` folder locally                                   |
 | `npm run lint`    | Run ESLint on the project                                         |
+| `npm test`        | Run loader and model integrity tests                              |
 
 ---
 
@@ -218,6 +218,7 @@ This project **does not use any environment variables** in the source code. Ther
 
 - **Character/index.tsx** – Thin wrapper around `Scene`.
 - **Character/Scene.tsx** – Creates Three.js scene, WebGLRenderer, camera; loads character via `setCharacter`, applies lighting and animations; handles resize and mouse/touch for head movement. Uses `setProgress` and `useLoading` to tie into the global loading state.
+- The runtime loads `public/models/character.enc` with the local Draco decoder. `character.glb` is tracked by Git LFS and is preserved for asset integrity. The loader offers **Continue without 3D** and automatically releases the page after eight seconds if the model stalls.
 
 ---
 

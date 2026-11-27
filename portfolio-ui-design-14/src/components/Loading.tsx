@@ -1,42 +1,36 @@
-/**
- * Full-screen loader. percent comes from LoadingProvider; Character loader
- * drives it via setProgress. When percent >= 100, we set loaded then isLoaded;
- * when isLoaded, we run initialFX and then setIsLoading(false) to unmount loader.
- */
+/** Loader with a normal entrance transition and a bounded fallback for slow 3D assets. */
 import { useEffect, useState } from "react";
 import "./styles/Loading.css";
 import { useLoading } from "../context/LoadingProvider";
 
-import Marquee from "react-fast-marquee";
+import MarqueeImport from "react-fast-marquee";
+
+// Vite 8 may expose this CommonJS package through a nested default export.
+const marqueeModule: unknown = MarqueeImport;
+const Marquee = (typeof marqueeModule === "object" && marqueeModule !== null && "default" in marqueeModule
+  ? marqueeModule.default
+  : marqueeModule) as typeof MarqueeImport;
 
 const Loading = ({ percent }: { percent: number }) => {
-  const { setIsLoading } = useLoading();
+  const { finishLoading } = useLoading();
   const [loaded, setLoaded] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [clicked, setClicked] = useState(false);
+  const completed = percent >= 100;
 
-  if (percent >= 100) {
-    setTimeout(() => {
-      setLoaded(true);
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 1000);
-    }, 600);
-  }
-
+  // A stalled asset never blocks the portfolio indefinitely.
   useEffect(() => {
-    import("./utils/initialFX").then((module) => {
-      if (isLoaded) {
-        setClicked(true);
-        setTimeout(() => {
-          if (module.initialFX) {
-            module.initialFX();
-          }
-          setIsLoading(false);
-        }, 900);
-      }
-    });
-  }, [isLoaded, setIsLoading]);
+    const timeout = setTimeout(() => finishLoading(), 8000);
+    return () => clearTimeout(timeout);
+  }, [finishLoading]);
+
+  // Schedule the existing success transition once, outside render.
+  useEffect(() => {
+    if (!completed) return;
+    const ready = setTimeout(() => setLoaded(true), 600);
+    const animate = setTimeout(() => setClicked(true), 1600);
+    const done = setTimeout(() => finishLoading("ready"), 2500);
+    return () => { clearTimeout(ready); clearTimeout(animate); clearTimeout(done); };
+  }, [completed, finishLoading]);
 
   /** Track mouse for CSS --mouse-x/--mouse-y (e.g. button hover effect) */
   function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
@@ -66,6 +60,7 @@ const Loading = ({ percent }: { percent: number }) => {
         </div>
       </div>
       <div className="loading-screen">
+        <button type="button" className="loading-continue" onClick={() => finishLoading()}>Continue without 3D</button>
         <div className="loading-marquee">
           <Marquee>
             <span> A Creative Developer</span> <span>A Creative Designer</span>
@@ -144,5 +139,6 @@ export const setProgress = (setLoading: (value: number) => void) => {
       }, 2);
     });
   }
-  return { loaded, percent, clear };
+  function cancel() { clearInterval(interval); }
+  return { loaded, percent, clear, cancel };
 };

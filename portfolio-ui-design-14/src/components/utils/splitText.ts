@@ -7,15 +7,27 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { splitSingleElement, type SplitResult } from "../../utils/splitTextFree";
 
 interface ParaElement extends HTMLElement {
-  anim?: gsap.core.Animation;
+  anim?: gsap.core.Tween;
   split?: SplitResult;
 }
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Revert both the generated DOM and its ScrollTriggers on preference changes or unmount.
+export function clearSplitText() {
+  document.querySelectorAll<ParaElement>(".para, .title").forEach((element) => {
+    element.anim?.scrollTrigger?.kill();
+    element.anim?.progress(1).kill();
+    element.split?.revert();
+    delete element.anim;
+    delete element.split;
+  });
+}
+
 export default function setSplitText() {
   ScrollTrigger.config({ ignoreMobileResize: true });
-  if (window.innerWidth < 900) return;
+  clearSplitText();
+  if (window.innerWidth < 900 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const paras = document.querySelectorAll<ParaElement>(".para");
   const titles = document.querySelectorAll<ParaElement>(".title");
 
@@ -24,11 +36,6 @@ export default function setSplitText() {
 
   paras.forEach((para: ParaElement) => {
     para.classList.add("visible");
-    if (para.anim) {
-      para.anim.progress(1).kill();
-      para.split?.revert();
-    }
-
     para.split = splitSingleElement(para, {
       type: "lines,words",
       linesClass: "split-line",
@@ -53,10 +60,6 @@ export default function setSplitText() {
   });
 
   titles.forEach((title: ParaElement) => {
-    if (title.anim) {
-      title.anim.progress(1).kill();
-      title.split?.revert();
-    }
     title.split = splitSingleElement(title, {
       type: "chars,lines",
       linesClass: "split-line",
@@ -80,5 +83,4 @@ export default function setSplitText() {
     );
   });
 
-  ScrollTrigger.addEventListener("refresh", () => setSplitText());
 }
